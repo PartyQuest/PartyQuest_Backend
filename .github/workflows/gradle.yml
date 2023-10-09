@@ -28,7 +28,11 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-        
+
+    - uses: actions/checkout@v3
+    - run: touch ./src/main/resources/application.properties
+    - run: echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.properties
+    - run: cat ./src/main/resources/application.properties
 
     - name: Run chmod to make gradlew executable
       run: chmod +x ./gradlew
@@ -37,9 +41,3 @@ jobs:
       uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
       with:
         arguments: build
-    - name: Upload Error Report Files To Artifacts
-      if: ${{ failure() }}
-      uses: actions/upload-artifact@v2
-      with:
-        name: report_files
-        path: report_files_*.tar.gz
