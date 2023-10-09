@@ -1,4 +1,4 @@
-package com.partyquest.backend;
+package com.partyquest.backend.controller;
 
 
 import org.junit.jupiter.api.DisplayName;
@@ -18,7 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
-public class Test01 {
+public class TestControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
