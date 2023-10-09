@@ -27,7 +27,8 @@ public class TestControllerTest {
     void test01() throws Exception {
         mockMvc.perform(
                 get("/test01/t1"))
-                .andDo(document("/t1", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()))
+                .andDo(
+                        document("/t1", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()))
         ).andExpect(status().isOk());
     }
 }
