@@ -2,10 +2,14 @@ package com.partyquest.backend.controller;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,9 +19,10 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
+@WebMvcTest(TestController.class)
 @AutoConfigureRestDocs
+@AutoConfigureMockMvc(addFilters = false)
 public class TestControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -26,9 +31,9 @@ public class TestControllerTest {
     @DisplayName("test01")
     void test01() throws Exception {
         mockMvc.perform(
-                get("/test01/t1")).andExpect(status().isOk());
-//                .andDo(
-//                        document("/t1", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()))
-//        )
+                get("/test01/t1"))
+                .andDo(
+                        document("/t1", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()))
+        ).andExpect(status().isOk());
     }
 }
