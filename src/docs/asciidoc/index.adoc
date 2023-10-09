@@ -1,0 +1,8 @@
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+= Spring Rest Docs
+
+include::{snippets}/t1/http-request.adoc[]
+include::{snippets}/t1/http-response.adoc[]
