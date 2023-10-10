@@ -20,11 +20,6 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    services:
-      redis:
-        image: redis:latest
-        ports:
-          - 6379:6379
           
     steps:
     - uses: actions/checkout@v3
@@ -41,6 +36,13 @@ jobs:
 
     - name: Run chmod to make gradlew executable
       run: chmod +x ./gradlew
+
+    - name: Install Redis
+  # You may pin to the exact commit or the version.
+  # uses: pustovitDmytro/redis-github-action@68d453ee8f338562b4c9c1ac8dddd42e51e0a49c
+      uses: pustovitDmytro/redis-github-action@v1.0.2
+      with:
+        redis-version: redis:latest
 
     - name: Redis Start
       run: redis-server
