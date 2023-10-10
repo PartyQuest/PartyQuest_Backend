@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -31,9 +32,12 @@ public class TestControllerTest {
     @DisplayName("test01")
     void test01() throws Exception {
         mockMvc.perform(
-                get("/test01/t1"))
-                .andDo(
-                        document("/t1", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()))
-        ).andExpect(status().isOk());
+                RestDocumentationRequestBuilders.get("/test01/t1")
+        ).andDo(document("t1")).andExpect(status().isOk());
+//        mockMvc.perform(
+//                get("/test01/t1"))
+//                .andDo(
+//                        document("/t1", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()))
+//        ).andExpect(status().isOk());
     }
 }
