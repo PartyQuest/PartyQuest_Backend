@@ -20,6 +20,9 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        redis-version: [6.2.4-v4, 6.2.6-v3]
           
     steps:
     - uses: actions/checkout@v3
@@ -37,11 +40,11 @@ jobs:
     - name: Run chmod to make gradlew executable
       run: chmod +x ./gradlew
 
-    - name: Redis in GitHub Actions
-      uses: nnhy/redis-github-action@v1.0
-
-    - name: Redis Start
-      run: redis-server
+    - name: Start Redis
+      uses: supercharge/redis-github-action@1.7.0
+      with:
+        redis-image: redis/redis-stack-server
+        redis-version: ${{ matrix.redis-version }}
     
     - name: Build with Gradle
       uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
