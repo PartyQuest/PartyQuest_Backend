@@ -20,8 +20,9 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
-@WebMvcTest(TestController.class)
+//@ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
+//@WebMvcTest(TestController.class)
+@SpringBootTest
 @AutoConfigureRestDocs
 @AutoConfigureMockMvc(addFilters = false)
 public class TestControllerTest {
