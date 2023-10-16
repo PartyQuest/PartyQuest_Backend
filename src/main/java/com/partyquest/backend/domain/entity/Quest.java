@@ -29,6 +29,10 @@ public class Quest {
     private String description;
     @Column
     private Boolean deleteHide;
+
+    @Column
+    private Boolean complete;
+
     @Column
     @Enumerated(EnumType.STRING)
     private QuestType type;

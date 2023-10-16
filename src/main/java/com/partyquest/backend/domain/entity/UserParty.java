@@ -22,5 +22,6 @@ public class UserParty {
     @ManyToOne
     @JoinColumn(name = "party_id")
     private Party party;
+    private boolean partyAdmin;
 
 }
