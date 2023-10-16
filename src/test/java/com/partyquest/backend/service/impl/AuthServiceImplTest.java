@@ -1,9 +1,7 @@
 package com.partyquest.backend.service.impl;
 
 import com.partyquest.backend.domain.dto.AuthDto;
-import com.partyquest.backend.domain.entity.User;
 import com.partyquest.backend.domain.repository.UserRepository;
-import com.partyquest.backend.service.logic.AuthService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +31,7 @@ class AuthServiceImplTest {
                 .nickname("nickname")
                 .password("password")
                 .build();
-        AuthDto.SignupResponseDto signup = authService.Signup(dto, "LOCAL");
+        AuthDto.SignupResponseDto signup = authService.SignUp(dto, "LOCAL");
         assertAll(
                 () -> assertEquals(signup.getEmail(), "email")
         );
@@ -52,7 +50,7 @@ class AuthServiceImplTest {
                 .nickname("nickname")
                 .password("password")
                 .build();
-        AuthDto.SignupResponseDto signup = authService.Signup(dtos, "LOCAL");
+        AuthDto.SignupResponseDto signup = authService.SignUp(dtos, "LOCAL");
 
 
         AuthDto.LoginRequestDto dto = AuthDto.LoginRequestDto.builder()

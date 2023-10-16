@@ -2,11 +2,12 @@ package com.partyquest.backend.domain.dto;
 
 
 import com.partyquest.backend.domain.entity.User;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+@Data
+@Builder
+@Getter
+@Setter
 public class AuthDto {
 
     @Data
@@ -42,6 +43,7 @@ public class AuthDto {
 
     @Data
     @Builder
+    @Getter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class SignupResponseDto {

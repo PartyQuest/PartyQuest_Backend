@@ -29,15 +29,14 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public AuthDto.SignupResponseDto Signup(AuthDto.SignupDto dto, String type) {
+    public AuthDto.SignupResponseDto SignUp(AuthDto.SignupDto dto, String type) {
         Optional<User> alreadyUser = userRepository.findByEmail(dto.getEmail());
         if(alreadyUser.isPresent()) {
             throw new EmailDuplicationException("email duplicated", ErrorCode.EMAIL_DUPLICATION);
         }
         User newUser = AuthDto.SignupDto.dtoToEntity(dto,type);
-        userRepository.save(newUser);
 
-        return AuthDto.SignupResponseDto.entityToDto(newUser);
+        return AuthDto.SignupResponseDto.entityToDto(userRepository.save(newUser));
     }
 
     @Override
@@ -63,6 +62,11 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String getEmailById(long id) {
-        return null;
+        Optional<User> optionalUser = userRepository.findById(id);
+        if(optionalUser.isPresent()) {
+            return optionalUser.get().getEmail();
+        } else {
+            throw new EmailNotFoundException("email not found",ErrorCode.EMAIL_NOT_FOUND);
+        }
     }
 }
