@@ -35,4 +35,21 @@ class AuthServiceImplTest {
                 () -> assertEquals(signup.getEmail(), "email")
         );
     }
+
+    @Test
+    void LoginTest() {
+        SignUpTest();
+        AuthDto.LoginRequestDto dto = AuthDto.LoginRequestDto.builder()
+                .email("email")
+                .password("password")
+                .build();
+        AuthDto.LoginResponseDto login = authService.Login(dto);
+        System.out.println(login.toString());
+    }
+
+    @Test
+    void LogoutTest() {
+        LoginTest();
+        authService.Logout(0);
+    }
 }
