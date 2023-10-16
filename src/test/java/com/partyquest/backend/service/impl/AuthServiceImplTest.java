@@ -40,8 +40,8 @@ class AuthServiceImplTest {
     void LoginTest() {
         SignUpTest();
         AuthDto.LoginRequestDto dto = AuthDto.LoginRequestDto.builder()
-                .email("email")
-                .password("password")
+                .email("email2")
+                .password("password2")
                 .build();
         AuthDto.LoginResponseDto login = authService.Login(dto);
         System.out.println(login.toString());
