@@ -6,10 +6,8 @@ import com.partyquest.backend.service.logic.AuthService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -30,5 +28,17 @@ public class AuthController {
         AuthDto.SignupResponseDto result = authService.SignUp(dto, local);
         log.info(dto.getEmail());
         return ResponseEntityFactory.createResponse("/user/{id}",result.getId(),result);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> Login(@RequestBody AuthDto.LoginRequestDto dto) {
+        AuthDto.LoginResponseDto responseDto = authService.Login(dto);
+        return ResponseEntityFactory.okResponse(responseDto);
+    }
+
+    @DeleteMapping("/logout")
+    public ResponseEntity<?> Logout(@AuthenticationPrincipal long id) {
+        authService.Logout(id);
+        return ResponseEntityFactory.noResponse();
     }
 }

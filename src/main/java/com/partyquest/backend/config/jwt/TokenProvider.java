@@ -1,5 +1,6 @@
-package com.partyquest.backend.config;
+package com.partyquest.backend.config.jwt;
 
+import com.partyquest.backend.config.redis.RedisDao;
 import com.partyquest.backend.domain.entity.User;
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.HttpServletRequest;

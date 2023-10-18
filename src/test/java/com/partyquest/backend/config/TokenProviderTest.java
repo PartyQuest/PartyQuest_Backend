@@ -1,5 +1,7 @@
 package com.partyquest.backend.config;
 
+import com.partyquest.backend.config.jwt.TokenProvider;
+import com.partyquest.backend.config.redis.RedisDao;
 import com.partyquest.backend.domain.entity.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

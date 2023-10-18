@@ -1,4 +1,4 @@
-package com.partyquest.backend.config;
+package com.partyquest.backend.config.redis;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

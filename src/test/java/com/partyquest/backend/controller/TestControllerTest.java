@@ -41,4 +41,11 @@ public class TestControllerTest {
 //                        document("/t1", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()))
 //        ).andExpect(status().isOk());
     }
+
+    @Test
+    void test02() throws Exception {
+        mockMvc.perform(
+                RestDocumentationRequestBuilders.post("/test01/t2").content("test")
+        );
+    }
 }

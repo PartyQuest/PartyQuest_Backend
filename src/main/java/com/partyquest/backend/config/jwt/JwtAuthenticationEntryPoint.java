@@ -1,4 +1,4 @@
-package com.partyquest.backend.config;
+package com.partyquest.backend.config.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;

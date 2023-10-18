@@ -1,7 +1,7 @@
 package com.partyquest.backend.service.impl;
 
-import com.partyquest.backend.config.RedisDao;
-import com.partyquest.backend.config.TokenProvider;
+import com.partyquest.backend.config.redis.RedisDao;
+import com.partyquest.backend.config.jwt.TokenProvider;
 import com.partyquest.backend.config.exception.EmailDuplicationException;
 import com.partyquest.backend.config.exception.EmailNotFoundException;
 import com.partyquest.backend.config.exception.ErrorCode;

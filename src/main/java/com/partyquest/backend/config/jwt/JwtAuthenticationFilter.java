@@ -1,4 +1,4 @@
-package com.partyquest.backend.config;
+package com.partyquest.backend.config.jwt;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
