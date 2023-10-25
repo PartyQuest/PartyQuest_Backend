@@ -8,6 +8,9 @@ import com.partyquest.backend.config.exception.ErrorCode;
 import com.partyquest.backend.domain.dto.AuthDto;
 import com.partyquest.backend.domain.entity.User;
 import com.partyquest.backend.domain.repository.UserRepository;
+import com.partyquest.backend.service.impl.oauth2.AccessToken;
+import com.partyquest.backend.service.impl.oauth2.ProviderService;
+import com.partyquest.backend.service.impl.oauth2.profile.ProfileDto;
 import com.partyquest.backend.service.logic.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,12 +23,17 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final TokenProvider tokenProvider;
     private final RedisDao redisDao;
+    private final ProviderService providerService;
 
     @Autowired
-    public AuthServiceImpl(UserRepository userRepository, TokenProvider tokenProvider, RedisDao redisDao) {
+    public AuthServiceImpl(UserRepository userRepository,
+                           TokenProvider tokenProvider,
+                           RedisDao redisDao,
+                           ProviderService providerService) {
         this.userRepository = userRepository;
         this.tokenProvider = tokenProvider;
         this.redisDao = redisDao;
+        this.providerService = providerService;
     }
 
     @Override
@@ -67,6 +75,49 @@ public class AuthServiceImpl implements AuthService {
             return optionalUser.get().getEmail();
         } else {
             throw new EmailNotFoundException("email not found",ErrorCode.EMAIL_NOT_FOUND);
+        }
+    }
+
+    @Override
+    public User getUserByEmail(String email) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if(optionalUser.isPresent()) {
+            return optionalUser.get();
+        } else {
+            throw new EmailNotFoundException("email not found",ErrorCode.EMAIL_NOT_FOUND);
+        }
+    }
+
+    @Override
+    public AuthDto.LoginResponseDto OAuth2Login(String code, String provider) {
+        AccessToken accessToken = providerService.getAccessToken(code, provider);
+        ProfileDto profile = providerService.getProfile(accessToken.getAccess_token(),provider);
+
+        Optional<User> optionalUser = userRepository.findByEmail(profile.getEmail());
+        if(optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            String[] tokens = tokenProvider.createToken(user).split("::");
+            return AuthDto.LoginResponseDto.builder()
+                    .email(user.getEmail())
+                    .accessToken(tokens[0])
+                    .refreshToken(tokens[1])
+                    .build();
+        } else {
+            User user = User.builder()
+                    .sns(provider)
+                    .email(profile.getEmail())
+                    .birth(null)
+                    .nickname(profile.getNickname())
+                    .password(null)
+                    .build();
+            user = userRepository.save(user);
+
+            String[] tokens = tokenProvider.createToken(user).split("::");
+            return AuthDto.LoginResponseDto.builder()
+                    .email(user.getEmail())
+                    .accessToken(tokens[0])
+                    .refreshToken(tokens[1])
+                    .build();
         }
     }
 }

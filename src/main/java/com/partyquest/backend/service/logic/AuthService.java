@@ -9,4 +9,6 @@ public interface AuthService {
     AuthDto.LoginResponseDto Login(AuthDto.LoginRequestDto dto);
     void Logout(long id);
     String getEmailById(long id);
+    User getUserByEmail(String email);
+    AuthDto.LoginResponseDto OAuth2Login(String code, String provider);
 }
