@@ -4,8 +4,8 @@ package com.partyquest.backend.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.LinkedList;
+import java.util.List;
 
 @Builder
 @NoArgsConstructor
@@ -32,10 +32,10 @@ public class Board {
     private Board board;
 
     @OneToMany(mappedBy = "board", orphanRemoval = true)
-    private Set<Board> boards = new LinkedHashSet<>();
+    private List<Board> boards = new LinkedList<>();
 
     @OneToMany(mappedBy = "board", orphanRemoval = true)
-    private Set<File> files = new LinkedHashSet<>();
+    private List<File> files = new LinkedList<>();
 
     @OneToOne(orphanRemoval = true)
     @JoinColumn(name = "writer_id")

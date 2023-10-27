@@ -1,5 +1,6 @@
 package com.partyquest.backend.service.impl;
 
+import com.partyquest.backend.config.exception.PasswordException;
 import com.partyquest.backend.config.redis.RedisDao;
 import com.partyquest.backend.config.jwt.TokenProvider;
 import com.partyquest.backend.config.exception.EmailDuplicationException;
@@ -49,10 +50,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthDto.LoginResponseDto Login(AuthDto.LoginRequestDto dto) {
+        if (dto.getPassword() == null) throw new PasswordException("LOCAL LOGIN'S PASSWORD IS NOT NULL",ErrorCode.PASSWORD_ERROR);
         Optional<User> optionalUser = userRepository.findByEmailAndPassword(dto.getEmail(),dto.getPassword());
-        if(optionalUser.isEmpty()) {
-            throw new EmailNotFoundException("email not found", ErrorCode.EMAIL_NOT_FOUND);
-        }
+        if(optionalUser.isEmpty()) throw new EmailNotFoundException("EMAIL NOT FOUND", ErrorCode.EMAIL_NOT_FOUND);
         User user = optionalUser.get();
         String[] tokens = tokenProvider.createToken(user).split("::");
 

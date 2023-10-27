@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 @Builder
@@ -30,13 +32,9 @@ public class Party {
     private Boolean isPublic;
 
     @OneToMany(mappedBy = "party", orphanRemoval = true)
-    private Set<UserParty> userParties = new LinkedHashSet<>();
-
-    @OneToOne(orphanRemoval = true)
-    @JoinColumn(name = "user_id")
-    private User partyMaster;
+    private List<UserParty> userParties = new LinkedList<>();
 
     @OneToMany(mappedBy = "party", orphanRemoval = true)
-    private Set<File> files = new LinkedHashSet<>();
+    private List<File> files = new LinkedList<>();
 
 }

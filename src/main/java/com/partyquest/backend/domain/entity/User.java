@@ -1,9 +1,12 @@
 package com.partyquest.backend.domain.entity;
 
+import com.partyquest.backend.domain.type.LoginType;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 @Builder
@@ -31,6 +34,6 @@ public class User {
 
 
     @OneToMany(mappedBy = "user", orphanRemoval = true)
-    private Set<UserParty> userParties = new LinkedHashSet<>();
+    private List<UserParty> userParties = new LinkedList<>();
 
 }

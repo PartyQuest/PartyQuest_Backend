@@ -4,6 +4,7 @@ package com.partyquest.backend.domain.dto;
 import com.partyquest.backend.domain.entity.User;
 import lombok.*;
 
+import java.util.LinkedList;
 @Data
 @Builder
 @Getter
@@ -32,7 +33,7 @@ public class AuthDto {
 
         public static User dtoToEntity(SignupDto signupDto, String type) {
             return User.builder()
-                    .userParties(null)
+                    .userParties(new LinkedList<>())
                     .birth(signupDto.getBirth())
                     .email(signupDto.getEmail())
                     .password(signupDto.getPassword())

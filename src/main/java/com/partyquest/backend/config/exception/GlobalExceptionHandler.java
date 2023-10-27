@@ -30,6 +30,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response,HttpStatus.valueOf(ex.getErrorCode().getStatus()));
     }
 
+    @ExceptionHandler(PasswordException.class)
+    public ResponseEntity<ErrorResponse> handlePasswordException(PasswordException ex) {
+        log.error("handlePasswordException",ex);
+        ErrorResponse response = new ErrorResponse(ex.getErrorCode());
+        return new ResponseEntity<>(response,HttpStatus.valueOf(ex.getErrorCode().getStatus()));
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception ex){

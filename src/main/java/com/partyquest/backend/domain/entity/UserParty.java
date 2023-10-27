@@ -1,5 +1,7 @@
 package com.partyquest.backend.domain.entity;
 
+import com.partyquest.backend.domain.type.PartyMemberType;
+import com.sun.istack.NotNull;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,6 +17,16 @@ public class UserParty {
     @Column
     private long id;
 
+    @Column
+    @Enumerated(EnumType.STRING)
+    PartyMemberType memberGrade;
+
+    @Column
+    private boolean partyAdmin;
+
+    @Column
+    private boolean registered;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -22,6 +34,6 @@ public class UserParty {
     @ManyToOne
     @JoinColumn(name = "party_id")
     private Party party;
-    private boolean partyAdmin;
+
 
 }
