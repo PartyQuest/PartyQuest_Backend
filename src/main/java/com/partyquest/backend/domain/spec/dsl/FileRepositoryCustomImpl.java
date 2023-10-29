@@ -1,4 +1,4 @@
 package com.partyquest.backend.domain.spec.dsl;
 
-public class FileRepositoryCustomImpl {
+public class FileRepositoryCustomImpl implements FileRepositoryCustom{
 }
