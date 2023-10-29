@@ -1,8 +1,17 @@
+// 추가
+buildscript {
+	ext {
+		queryDslVersion = "5.0.0"
+	}
+}
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.1.4'
 	id 'io.spring.dependency-management' version '1.1.3'
 	id 'org.asciidoctor.jvm.convert' version '3.3.2'
+	// 추가
+	//id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 }
 
 group = 'com.partyquest'
@@ -28,6 +37,12 @@ ext {
 }
 
 dependencies {
+// ⭐ Spring boot 3.x이상에서 QueryDsl 패키지를 정의하는 방법
+	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+	annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
@@ -49,6 +64,21 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 
 	asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+}
+
+// === ⭐ QueryDsl 빌드 옵션 (선택) ===
+def querydslDir = "$buildDir/generated/querydsl"
+
+sourceSets {
+	main.java.srcDirs += [ querydslDir ]
+}
+
+tasks.withType(JavaCompile) {
+	options.getGeneratedSourceOutputDirectory().set(file(querydslDir))
+}
+
+clean.doLast {
+	file(querydslDir).deleteDir()
 }
 
 tasks.named('test') {

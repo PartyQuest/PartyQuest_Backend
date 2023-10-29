@@ -9,7 +9,7 @@ import lombok.*;
 @Getter
 @Setter
 @Entity(name = "tb_file")
-public class File {
+public class File extends DataCheck {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column

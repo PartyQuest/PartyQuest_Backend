@@ -14,7 +14,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity(name = "tb_party")
-public class Party {
+public class Party extends DataCheck {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column

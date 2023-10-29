@@ -15,7 +15,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity(name = "tb_user")
-public class User {
+public class User extends DataCheck {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column

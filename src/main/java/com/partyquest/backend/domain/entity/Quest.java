@@ -13,7 +13,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity(name = "tb_quest")
-public class Quest {
+public class Quest extends DataCheck {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column

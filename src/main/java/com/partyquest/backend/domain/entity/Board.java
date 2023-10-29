@@ -13,7 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity(name = "tb_board")
-public class Board {
+public class Board extends DataCheck{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
@@ -24,8 +24,6 @@ public class Board {
     private String content;
     @Column
     private String type;
-    @Column
-    private Boolean deleteHide;
 
     @ManyToOne
     @JoinColumn(name = "board_id")

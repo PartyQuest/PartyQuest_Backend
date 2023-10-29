@@ -49,7 +49,7 @@ class PartyServiceImplTest {
                         .title("title1")
                 .build(),id);
 
-        Party result = partyRepository.findByTitle("title1");
+        Party result = partyRepository.findByTitle("title1").get(0);
 
         System.out.println(userPartyRepository.findByParty(result).getMemberGrade());
 

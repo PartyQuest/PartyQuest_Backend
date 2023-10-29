@@ -11,7 +11,7 @@ import lombok.*;
 @Getter
 @Setter
 @Entity(name = "tb_user_party")
-public class UserParty {
+public class UserParty extends DataCheck {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column

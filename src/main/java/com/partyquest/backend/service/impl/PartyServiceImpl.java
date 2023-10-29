@@ -78,4 +78,17 @@ public class PartyServiceImpl implements PartyService {
 
         return PartyDto.CreatePartyDto.Response.entityToDto(party);
     }
+
+    //검색 키워드, 파티이름, 파티장
+    @Override
+    public List<PartyDto.ReadPartyDto.Response> readPartyDto() {
+        return null;
+    }
+
+    @Override
+    public PartyDto.ReadPartyDto.Response readPartyDto(long id) {
+        return null;
+    }
+
+
 }

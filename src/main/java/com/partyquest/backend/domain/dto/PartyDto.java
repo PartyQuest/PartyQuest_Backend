@@ -16,8 +16,6 @@ public class PartyDto {
 
     @Data
     @Builder
-//    @NoArgsConstructor
-//    @AllArgsConstructor
     public static class CreatePartyDto {
 
         @Data
@@ -78,5 +76,34 @@ public class PartyDto {
             }
         }
 
+    }
+
+    @Data
+    @Builder
+    public static class ReadPartyDto {
+        @Data
+        @Builder
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class Response {
+            private long id;
+            private String partyMaster;
+            private String title;
+            private String description;
+            private int capability;
+            private String thumbnailPath;
+
+            public static Response entityToDto(Party party) {
+                return Response.builder()
+                        .id(party.getId())
+                        .partyMaster(null)
+                        .title(party.getTitle())
+                        .description(party.getDescription())
+                        .capability(party.getCapabilities())
+                        .thumbnailPath(null)
+                        .build();
+            }
+
+        }
     }
 }
