@@ -92,6 +92,7 @@ public class PartyDto {
             private String description;
             private int capability;
             private String thumbnailPath;
+            private long userPartyId;
 
             public static Response entityToDto(Party party) {
                 return Response.builder()

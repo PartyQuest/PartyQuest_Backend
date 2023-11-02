@@ -3,12 +3,15 @@ package com.partyquest.backend.service.impl;
 import com.partyquest.backend.config.exception.EmailNotFoundException;
 import com.partyquest.backend.config.exception.ErrorCode;
 import com.partyquest.backend.domain.dto.PartyDto;
+import com.partyquest.backend.domain.entity.File;
 import com.partyquest.backend.domain.entity.Party;
 import com.partyquest.backend.domain.entity.User;
 import com.partyquest.backend.domain.entity.UserParty;
+import com.partyquest.backend.domain.repository.FileRepository;
 import com.partyquest.backend.domain.repository.PartyRepository;
 import com.partyquest.backend.domain.repository.UserPartyRepository;
 import com.partyquest.backend.domain.repository.UserRepository;
+import com.partyquest.backend.domain.type.FileType;
 import com.partyquest.backend.domain.type.PartyMemberType;
 import com.partyquest.backend.service.logic.PartyService;
 import jakarta.transaction.Transactional;
@@ -16,11 +19,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.security.SecureRandom;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static com.partyquest.backend.domain.dto.PartyDto.*;
 
 @Service
 @Slf4j
@@ -29,14 +31,17 @@ public class PartyServiceImpl implements PartyService {
     private final PartyRepository partyRepository;
     private final UserRepository userRepository;
     private final UserPartyRepository userPartyRepository;
+    private final FileRepository fileRepository;
 
     @Autowired
     public PartyServiceImpl(PartyRepository partyRepository,
                             UserRepository userRepository,
-                            UserPartyRepository userPartyRepository) {
+                            UserPartyRepository userPartyRepository,
+                            FileRepository fileRepository) {
         this.partyRepository = partyRepository;
         this.userRepository = userRepository;
         this.userPartyRepository = userPartyRepository;
+        this.fileRepository = fileRepository;
     }
 
     @Override
@@ -68,21 +73,45 @@ public class PartyServiceImpl implements PartyService {
         parties.add(save);
         user.setUserParties(parties);
 
-
 //        party 연결
         List<UserParty> partySet = party.getUserParties();
         partySet.add(save);
         party.setUserParties(partySet);
-
-
 
         return PartyDto.CreatePartyDto.Response.entityToDto(party);
     }
 
     //검색 키워드, 파티이름, 파티장
     @Override
-    public List<PartyDto.ReadPartyDto.Response> readPartyDto() {
-        return null;
+    public List<PartyDto.ReadPartyDto.Response> readPartyDto(String master, String title, Long id) {
+        List<Party> parties = partyRepository.getParties(master, title, id);
+        return parties.stream()
+                .map(party -> {
+                    String thumbnailPath = party.getFiles().stream()
+                            .filter(file -> file.getType() == FileType.PARTY_THUMBNAIL)
+                            .map(File::getFilePath)
+                            .findFirst()
+                            .orElse(null);
+
+                    String partyMaster = party.getUserParties().stream()
+                            .filter(userParty -> userParty.getMemberGrade() == PartyMemberType.MASTER)
+                            .map(UserParty::getUser)
+                            .filter(user -> master == null || user.getNickname().equals(master))
+                            .map(User::getNickname)
+                            .findFirst().orElse(null);
+
+                    log.info(partyMaster);
+
+                    return ReadPartyDto.Response.builder()
+                            .thumbnailPath(thumbnailPath)
+                            .id(party.getId())
+                            .partyMaster(partyMaster)
+                            .capability(party.getCapabilities())
+                            .description(party.getDescription())
+                            .title(party.getTitle())
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -90,5 +119,21 @@ public class PartyServiceImpl implements PartyService {
         return null;
     }
 
+    @Override
+    public boolean deleteParty(List<Long> partyIds) {
+        try {
+            for (Long partyId : partyIds) {
+                Optional<Party> party = partyRepository.findById(partyId);
+                if (party.isPresent()) {
+                    Party tmp = party.get();
+                    tmp.setIsDelete(true);
+                    partyRepository.save(tmp);
+                }
 
+            }
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

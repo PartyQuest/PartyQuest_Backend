@@ -1,5 +1,13 @@
 package com.partyquest.backend.domain.type;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.partyquest.backend.config.JsonEnumTypeConfig;
+
 public enum FileType {
-    PARTY_THUMBNAIL, QUEST,
+    PARTY_THUMBNAIL, QUEST;
+
+    @JsonCreator
+    public static FileType fromString(String value) {
+        return JsonEnumTypeConfig.fromString(FileType.class,value);
+    }
 }

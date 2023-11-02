@@ -44,6 +44,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers(
                                 //new AntPathRequestMatcher("/**")
+                                new AntPathRequestMatcher("/test/**"),
                                 new AntPathRequestMatcher("/h2-console/**"),
                                 new AntPathRequestMatcher("/auth/**")
 //                                new AntPathRequestMatcher("/login/**")

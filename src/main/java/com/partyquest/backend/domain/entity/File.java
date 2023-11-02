@@ -1,5 +1,6 @@
 package com.partyquest.backend.domain.entity;
 
+import com.partyquest.backend.domain.type.FileType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,7 +17,8 @@ public class File extends DataCheck {
     private long id;
 
     @Column
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private FileType type;
     @Column
     private String fileAttachChngName;
     @Column
@@ -28,11 +30,11 @@ public class File extends DataCheck {
     @Column
     private String errMsg;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
     private Board board;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "party_id")
     private Party party;
 

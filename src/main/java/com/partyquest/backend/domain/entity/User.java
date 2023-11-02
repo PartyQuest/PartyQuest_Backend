@@ -4,10 +4,7 @@ import com.partyquest.backend.domain.type.LoginType;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Builder
 @NoArgsConstructor
@@ -35,5 +32,8 @@ public class User extends DataCheck {
 
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<UserParty> userParties = new LinkedList<>();
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    private List<DeviceToken> deviceTokens = new ArrayList<>();
 
 }

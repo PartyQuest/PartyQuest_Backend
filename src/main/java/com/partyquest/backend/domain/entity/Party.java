@@ -2,6 +2,7 @@ package com.partyquest.backend.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -18,7 +19,7 @@ public class Party extends DataCheck {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
-    private long id;
+    private Long id;
 
     @Column
     private String accessCode;
@@ -34,7 +35,12 @@ public class Party extends DataCheck {
     @OneToMany(mappedBy = "party", orphanRemoval = true)
     private List<UserParty> userParties = new LinkedList<>();
 
-    @OneToMany(mappedBy = "party", orphanRemoval = true)
-    private List<File> files = new LinkedList<>();
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "party", orphanRemoval = true)
+    @BatchSize(size = 100)
+    private List<File> files = new java.util.ArrayList<>();
+
+    public void setIsDeleted(boolean isDeleted) {
+        super.setIsDelete(isDeleted);
+    }
 
 }

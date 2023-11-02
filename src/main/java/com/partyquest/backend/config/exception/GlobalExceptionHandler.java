@@ -37,6 +37,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response,HttpStatus.valueOf(ex.getErrorCode().getStatus()));
     }
 
+    @ExceptionHandler(EnumTypeNotMatchedException.class)
+    public ResponseEntity<ErrorResponse> handleEnumTypeNotMatchedException(EnumTypeNotMatchedException ex) {
+        log.error("handleEnumTypeNotMatchedException",ex);
+        ErrorResponse response = new ErrorResponse(ex.getErrorCode());
+        return new ResponseEntity<>(response,HttpStatus.valueOf(ex.getErrorCode().getStatus()));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception ex){
         log.error("handleException",ex);

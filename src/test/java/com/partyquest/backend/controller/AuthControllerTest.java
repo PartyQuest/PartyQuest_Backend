@@ -13,6 +13,7 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -45,7 +46,11 @@ class AuthControllerTest {
                 .contentType("application/json")
                 .accept("application/json")
                 .content(objectMapper.writeValueAsString(dto))
-        ).andDo(document("auth")).andExpect(status().isCreated());
+        ).andDo(
+                document(
+                        "signup",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()))).andExpect(status().isCreated());
     }
 
     @Test
@@ -75,7 +80,7 @@ class AuthControllerTest {
                 .contentType("application/json")
                 .accept("application/json")
                 .content(objectMapper.writeValueAsString(loginDto))
-        ).andDo(document("auth")).andDo(print()).andExpect(status().isOk());
+        ).andDo(document("login",preprocessRequest(prettyPrint()),preprocessResponse(prettyPrint()))).andDo(print()).andExpect(status().isOk());
 
     }
 }

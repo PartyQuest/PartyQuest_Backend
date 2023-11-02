@@ -8,6 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface UserPartyRepository extends JpaRepository<UserParty,Long>, UserPartyRepositoryCustom {
-    @Query("select t from tb_user_party t where t.party = ?1")
-    UserParty findByParty(Party party);
+
 }

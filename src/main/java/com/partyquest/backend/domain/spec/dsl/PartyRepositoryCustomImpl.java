@@ -1,11 +1,14 @@
 package com.partyquest.backend.domain.spec.dsl;
 
+import com.partyquest.backend.domain.dto.PartyDto;
 import com.partyquest.backend.domain.entity.Party;
 import com.partyquest.backend.domain.type.PartyMemberType;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.annotation.Nullable;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,6 +17,7 @@ import java.util.Optional;
 import static com.partyquest.backend.domain.entity.QParty.party;
 import static com.partyquest.backend.domain.entity.QUserParty.userParty;
 import static com.partyquest.backend.domain.entity.QUser.user;
+import static com.partyquest.backend.domain.entity.QFile.file;
 
 @RequiredArgsConstructor
 @Repository
@@ -24,6 +28,16 @@ public class PartyRepositoryCustomImpl implements PartyRepositoryCustom {
     @Override
     public List<Party> findByTitle(String title) {
         return jpaQueryFactory.selectFrom(party).where(party.title.eq(title)).fetch();
+    }
+
+    @Override
+    public String findMasterNameByParty(Party searchParty) {
+        return jpaQueryFactory
+                .select(user.nickname)
+                .from(party)
+                .join(party.userParties,userParty).fetchJoin()
+                .join(userParty.user, user).fetchJoin()
+                .where(party.eq(searchParty),userParty.memberGrade.eq(PartyMemberType.MASTER)).fetchOne();
     }
 
     /**
@@ -37,22 +51,24 @@ public class PartyRepositoryCustomImpl implements PartyRepositoryCustom {
      * @return Optional
      */
     @Override
-    public Optional<List<Party>> getParty(@Nullable String master,@Nullable String title) {
-        return Optional.ofNullable(
-                jpaQueryFactory
-                    .selectFrom(party)
-                    .join(party.userParties,userParty)
-                    .join(userParty.user, user)
-                    .where(titleEq(title),masterEq(master),party.isPublic.eq(true),party.isDelete.eq(false))
-                .fetch()
-        );
-//        return jpaQueryFactory
-//                .selectFrom(party)
-//                .join(party.userParties, userParty)
-//                .join(userParty.user, user)
-//                .where(userParty.memberGrade.eq(PartyMemberType.MASTER), user.nickname.eq(master))
-//                .fetch();
+    //[TODO]File Query 따로 분리하기
+    public List<Party> getParties(String master, String title, Long id) {
+        return jpaQueryFactory
+                .selectFrom(party)
+                .join(party.userParties, userParty).fetchJoin()
+                .leftJoin(party.files, file)
+                .join(userParty.user,user).fetchJoin()
+                .where(
+                        titleEq(title),
+                        masterEq(master),
+                        party.isPublic.eq(true),
+                        party.isDelete.eq(false),partyIdEq(id)
+                )
+                .fetch();
     }
+
+
+
     @Override
     public Optional<Party> getParty(long id) {
         return Optional.ofNullable(
@@ -69,4 +85,5 @@ public class PartyRepositoryCustomImpl implements PartyRepositoryCustom {
     private BooleanExpression titleEq(String title) {
         return title != null? party.title.eq(title):null;
     }
+    private BooleanExpression partyIdEq(Long id) { return id != null? party.id.eq(id):null;}
 }
