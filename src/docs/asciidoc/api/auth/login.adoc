@@ -1,0 +1,9 @@
+=== LOGIN API
+
+==== HTTP Request Body
+include::{snippets}/login/http-request.adoc[]
+include::{snippets}/login/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/login/http-response.adoc[]
+include::{snippets}/login/response-body.adoc[]

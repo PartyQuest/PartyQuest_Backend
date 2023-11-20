@@ -1,0 +1,9 @@
+=== Party Read API
+
+==== HTTP Request Body
+include::{snippets}/read_party_list/http-request.adoc[]
+include::{snippets}/read_party_list/query-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/read_party_list/http-response.adoc[]
+include::{snippets}/read_party_list/response-body.adoc[]

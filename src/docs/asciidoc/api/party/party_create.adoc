@@ -1,0 +1,9 @@
+=== Party Create API
+
+==== HTTP Request Body
+include::{snippets}/create_party/http-request.adoc[]
+include::{snippets}/create_party/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/create_party/http-response.adoc[]
+include::{snippets}/create_party/response-body.adoc[]

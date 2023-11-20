@@ -1,0 +1,2 @@
+include::party_create.adoc[]
+include::party_read.adoc[]

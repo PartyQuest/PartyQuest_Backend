@@ -1,0 +1,9 @@
+=== SIGN-UP API
+
+==== HTTP Request Body
+include::{snippets}/signup/http-request.adoc[]
+include::{snippets}/signup/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/signup/http-response.adoc[]
+include::{snippets}/signup/response-body.adoc[]
