@@ -2,6 +2,7 @@ package com.partyquest.backend.domain.dto;
 
 
 import com.partyquest.backend.domain.entity.User;
+import com.partyquest.backend.service.impl.BCryptService;
 import lombok.*;
 
 import java.util.LinkedList;
@@ -10,6 +11,21 @@ import java.util.LinkedList;
 @Getter
 @Setter
 public class AuthDto {
+    @Data
+    @Builder
+    public static class OAuthLogin {
+
+        @Data
+        @Builder
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class Request {
+            private String email;
+            private String secrets;
+            private String nickname;
+        }
+    }
+
 
     @Data
     @Builder
@@ -31,10 +47,12 @@ public class AuthDto {
         private String nickname;
 
         public static User dtoToEntity(SignupDto signupDto, String type) {
+            BCryptService service = new BCryptService();
+            String password = service.encodeBcrypt(signupDto.getPassword());
             return User.builder()
                     .userParties(new LinkedList<>())
                     .email(signupDto.getEmail())
-                    .password(signupDto.getPassword())
+                    .password(password)
                     .nickname(signupDto.getNickname())
                     .sns(type).build();
         }

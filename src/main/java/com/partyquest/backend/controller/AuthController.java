@@ -51,18 +51,9 @@ public class AuthController {
         return ResponseEntityFactory.noResponse();
     }
 
-    @GetMapping("/oauth/{provider}/callback")
-    public ResponseEntity<?> OAuth2Login(@PathVariable("provider") String provider, @RequestParam("code") String code) {
-        AuthDto.LoginResponseDto dto = authService.OAuth2Login(code, provider);
-        return ResponseEntityFactory.okResponse(dto);
-    }
-
-    @GetMapping("/oauth/{provider}/redirect")
-    public void oauthRedirect(HttpServletResponse response, @PathVariable("provider") String provider) throws IOException {
-        if(provider.equals("kakao")) {
-            response.sendRedirect("https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=d45ddad96d82ea26ed87c0d239b27d01&redirect_uri=http://localhost:8080/auth/oauth/kakao/callback");
-        } else if(provider.equals("naver")) {
-            response.sendRedirect("https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=nz1hUhcxlgDYkqjKuunY&redirect_uri=http://localhost:8080/auth/oauth/naver/callback&state=RAMDOM_STATE");
-        }
+    @PostMapping("/login/oauth/{provider}")
+    public ResponseEntity<?> OAuthLogin(@RequestBody AuthDto.OAuthLogin.Request dto, @PathVariable String provider) {
+        AuthDto.LoginResponseDto result = authService.OAuth2Login(dto, provider);
+        return ResponseEntityFactory.okResponse(result);
     }
 }
