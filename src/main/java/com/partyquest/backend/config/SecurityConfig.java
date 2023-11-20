@@ -43,7 +43,7 @@ public class SecurityConfig {
                 .headers((headers) -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers(
-                                //new AntPathRequestMatcher("/**")
+                                new AntPathRequestMatcher("/docs/index.html"),
                                 new AntPathRequestMatcher("/test/**"),
                                 new AntPathRequestMatcher("/h2-console/**"),
                                 new AntPathRequestMatcher("/auth/**")
