@@ -106,7 +106,6 @@ public class AuthServiceImpl implements AuthService {
             User user = User.builder()
                     .sns(provider)
                     .email(profile.getEmail())
-                    .birth(null)
                     .nickname(profile.getNickname())
                     .password(null)
                     .build();

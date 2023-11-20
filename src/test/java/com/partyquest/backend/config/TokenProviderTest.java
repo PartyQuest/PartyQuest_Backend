@@ -22,7 +22,7 @@ class TokenProviderTest {
 
     @Test
     void tokenTest() {
-        User user = new User(0,"test@test.com","test","1234","1234",null,null,null);
+        User user = new User(0,"test@test.com","test","1234","LOCAL",null,null);
         String[] tokens = tokenProvider.createToken(user).split("::");
 
         MockHttpServletRequest request = new MockHttpServletRequest();

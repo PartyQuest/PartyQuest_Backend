@@ -6,6 +6,7 @@ import com.partyquest.backend.service.impl.oauth2.AccessToken;
 import com.partyquest.backend.service.impl.oauth2.ProviderService;
 import com.partyquest.backend.service.impl.oauth2.profile.ProfileDto;
 import com.partyquest.backend.service.logic.AuthService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/auth")
@@ -52,5 +55,14 @@ public class AuthController {
     public ResponseEntity<?> OAuth2Login(@PathVariable("provider") String provider, @RequestParam("code") String code) {
         AuthDto.LoginResponseDto dto = authService.OAuth2Login(code, provider);
         return ResponseEntityFactory.okResponse(dto);
+    }
+
+    @GetMapping("/oauth/{provider}/redirect")
+    public void oauthRedirect(HttpServletResponse response, @PathVariable("provider") String provider) throws IOException {
+        if(provider.equals("kakao")) {
+            response.sendRedirect("https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=d45ddad96d82ea26ed87c0d239b27d01&redirect_uri=http://localhost:8080/auth/oauth/kakao/callback");
+        } else if(provider.equals("naver")) {
+            response.sendRedirect("https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=nz1hUhcxlgDYkqjKuunY&redirect_uri=http://localhost:8080/auth/oauth/naver/callback&state=RAMDOM_STATE");
+        }
     }
 }

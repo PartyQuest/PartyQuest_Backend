@@ -35,7 +35,6 @@ public class WithAccountSecurityContextFactory implements WithSecurityContextFac
         return User.builder()
                 .password("password")
                 .nickname("nickname")
-                .birth("birth")
                 .email(email)
                 .sns("LOCAL")
                 .userParties(null)

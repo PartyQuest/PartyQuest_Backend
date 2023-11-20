@@ -10,10 +10,13 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -36,7 +39,6 @@ class AuthControllerTest {
     void sign_up() throws Exception {
         AuthDto.SignupDto dto = AuthDto.SignupDto.builder()
                 .email("email")
-                .birth("birth")
                 .nickname("nickname")
                 .password("password")
                 .build();
@@ -50,7 +52,13 @@ class AuthControllerTest {
                 document(
                         "signup",
                         preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint()))).andExpect(status().isCreated());
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("email").type(JsonFieldType.STRING).description("User email"),
+                                fieldWithPath("nickname").type(JsonFieldType.STRING).description("User nickname"),
+                                fieldWithPath("password").type(JsonFieldType.STRING).description("Encrypt password")
+                        )
+                        )).andExpect(status().isCreated());
     }
 
     @Test
@@ -58,7 +66,6 @@ class AuthControllerTest {
     void log_in() throws Exception {
         AuthDto.SignupDto dto = AuthDto.SignupDto.builder()
                 .email("email2")
-                .birth("birth")
                 .nickname("nickname")
                 .password("password")
                 .build();
@@ -80,7 +87,15 @@ class AuthControllerTest {
                 .contentType("application/json")
                 .accept("application/json")
                 .content(objectMapper.writeValueAsString(loginDto))
-        ).andDo(document("login",preprocessRequest(prettyPrint()),preprocessResponse(prettyPrint()))).andDo(print()).andExpect(status().isOk());
+        ).andDo(document(
+                "login",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                requestFields(
+                        fieldWithPath("email").type(JsonFieldType.STRING).description("User email"),
+                        fieldWithPath("password").type(JsonFieldType.STRING).description("Encrypt password")
+                )))
+                .andDo(print()).andExpect(status().isOk());
 
     }
 }

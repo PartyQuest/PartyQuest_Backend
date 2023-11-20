@@ -27,7 +27,6 @@ class AuthServiceImplTest {
     void SignUpTest() {
         AuthDto.SignupDto dto = AuthDto.SignupDto.builder()
                 .email("email")
-                .birth("birth")
                 .nickname("nickname")
                 .password("password")
                 .build();
@@ -46,7 +45,6 @@ class AuthServiceImplTest {
 
         AuthDto.SignupDto dtos = AuthDto.SignupDto.builder()
                 .email("emails")
-                .birth("birth")
                 .nickname("nickname")
                 .password("password")
                 .build();

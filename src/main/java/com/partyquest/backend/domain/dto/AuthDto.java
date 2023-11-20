@@ -29,12 +29,10 @@ public class AuthDto {
         private String email;
         private String password;
         private String nickname;
-        private String birth;
 
         public static User dtoToEntity(SignupDto signupDto, String type) {
             return User.builder()
                     .userParties(new LinkedList<>())
-                    .birth(signupDto.getBirth())
                     .email(signupDto.getEmail())
                     .password(signupDto.getPassword())
                     .nickname(signupDto.getNickname())
