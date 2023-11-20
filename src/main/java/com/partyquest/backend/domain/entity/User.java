@@ -25,8 +25,6 @@ public class User extends DataCheck {
     @Column
     private String nickname;
     @Column
-    private String birth;
-    @Column
     private String sns;
 
 
