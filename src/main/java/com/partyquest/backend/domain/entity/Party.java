@@ -32,8 +32,8 @@ public class Party extends DataCheck {
     @Column
     private Boolean isPublic;
 
-    @OneToMany(mappedBy = "party", orphanRemoval = true)
-    private List<UserParty> userParties = new LinkedList<>();
+    @OneToMany(mappedBy = "party", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserParty> userParties = new java.util.ArrayList<>();
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "party", orphanRemoval = true)
     @BatchSize(size = 100)

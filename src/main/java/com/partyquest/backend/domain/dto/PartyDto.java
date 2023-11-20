@@ -25,7 +25,7 @@ public class PartyDto {
         public static class Request {
             private String title;
             private String description;
-            private boolean isPublic;
+            private Boolean isPublic;
 
             private String generateRandomString(int length) {
                 String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -63,7 +63,7 @@ public class PartyDto {
             private int capability;
             private String title;
             private String accessCode;
-            private boolean isPublic;
+            private Boolean isPublic;
 
             public static Response entityToDto(Party party) {
                 return Response.builder()

@@ -44,41 +44,88 @@ public class PartyServiceImpl implements PartyService {
         this.fileRepository = fileRepository;
     }
 
+    private User getUserData(long makerId) {
+        Optional<User> optional = userRepository.findById(makerId);
+        if(optional.isPresent()) return optional.get();
+        else throw new EmailNotFoundException("USER NOT FOUND", ErrorCode.INTER_SERVER_ERROR);
+    }
+
     @Override
     @Transactional
-    public PartyDto.CreatePartyDto.Response createPartyDto(PartyDto.CreatePartyDto.Request request, long makerID) {
+    public PartyDto.CreatePartyDto.Response createParty(PartyDto.CreatePartyDto.Request request, long makerID) {
+        User user = getUserData(makerID);
+        Party party = partyRepository.save(CreatePartyDto.Request.dtoToEntity(request));
 
-        //Party Entity 생성
-        Party party = PartyDto.CreatePartyDto.Request.dtoToEntity(request);
-        Party partySave = partyRepository.save(party);
-        //파티 생성자(마스터) 계정정보 호출
-        User user;
-        Optional<User> optionalUser = userRepository.findById(makerID);
-        if(optionalUser.isEmpty()) throw new EmailNotFoundException("USER NOT FOUND", ErrorCode.EMAIL_NOT_FOUND);
-        else user = optionalUser.get();
-
-        //연결 테이블 UserParty 계정-파티 연결
         UserParty userParty = UserParty.builder()
                 .user(user)
+                .registered(true)
+                .memberGrade(PartyMemberType.MASTER)
                 .party(party)
                 .partyAdmin(true)
-                .memberGrade(PartyMemberType.MASTER)
-                .registered(true)
                 .build();
-        UserParty save = userPartyRepository.save(userParty);
 
-        // User - UserParty - Party 연결
-        //User 연결
-        List<UserParty> parties = user.getUserParties();
-        parties.add(save);
-        user.setUserParties(parties);
+        userPartyRepository.save(userParty);
 
-//        party 연결
-        List<UserParty> partySet = party.getUserParties();
-        partySet.add(save);
-        party.setUserParties(partySet);
+        party.getUserParties().add(userParty);
+        user.getUserParties().add(userParty);
+
+        File file = File.builder()
+                .party(party)
+                .fileAttachChngName("test code")
+                .filePath("test path")
+                .fileOriginalName("test origin")
+                .type(FileType.PARTY_THUMBNAIL)
+                .fileSize(1234)
+                .build();
+
+        fileRepository.save(file);
+        party.getFiles().add(file);
 
         return PartyDto.CreatePartyDto.Response.entityToDto(party);
+
+
+
+//
+//        //Party Entity 생성
+//        Party party = PartyDto.CreatePartyDto.Request.dtoToEntity(request);
+//        Party partySave = partyRepository.save(party);
+//        //파티 생성자(마스터) 계정정보 호출
+//        User user;
+//        Optional<User> optionalUser = userRepository.findById(makerID);
+//        if(optionalUser.isEmpty()) throw new EmailNotFoundException("USER NOT FOUND", ErrorCode.EMAIL_NOT_FOUND);
+//        else user = optionalUser.get();
+//
+//        //연결 테이블 UserParty 계정-파티 연결
+//        UserParty userParty = UserParty.builder()
+//                .user(user)
+//                .party(partySave)
+//                .partyAdmin(true)
+//                .memberGrade(PartyMemberType.MASTER)
+//                .registered(true)
+//                .build();
+//        UserParty save = userPartyRepository.save(userParty);
+//
+//        // User - UserParty - Party 연결
+//        //User 연결
+//        List<UserParty> parties = user.getUserParties();
+//        parties.add(save);
+//        user.setUserParties(parties);
+//
+////        party 연결
+//        List<UserParty> partySet = party.getUserParties();
+//        partySet.add(save);
+//        party.setUserParties(partySet);
+//
+//        //[TODO] 이미지 결정해서 서버에 추가해야함
+//        File file = File.builder()
+//                .type(FileType.PARTY_THUMBNAIL)
+//                .fileOriginalName("TEMP ORIGINAL NAME")
+//                .filePath("TEMP PATH")
+//                .fileAttachChngName("TEMP")
+//                .party(partySave)
+//                .build();
+//
+//        return PartyDto.CreatePartyDto.Response.entityToDto(party);
     }
 
     //검색 키워드, 파티이름, 파티장

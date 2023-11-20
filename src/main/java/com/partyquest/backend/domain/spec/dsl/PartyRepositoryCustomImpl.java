@@ -51,7 +51,6 @@ public class PartyRepositoryCustomImpl implements PartyRepositoryCustom {
      * @return Optional
      */
     @Override
-    //[TODO]File Query 따로 분리하기
     public List<Party> getParties(String master, String title, Long id) {
         return jpaQueryFactory
                 .selectFrom(party)
@@ -83,7 +82,7 @@ public class PartyRepositoryCustomImpl implements PartyRepositoryCustom {
         return master != null? userParty.memberGrade.eq(PartyMemberType.MASTER).and(user.nickname.eq(master)) : null;
     }
     private BooleanExpression titleEq(String title) {
-        return title != null? party.title.eq(title):null;
+        return title != null? party.title.like("%"+title+"%"):null;
     }
     private BooleanExpression partyIdEq(Long id) { return id != null? party.id.eq(id):null;}
 }
