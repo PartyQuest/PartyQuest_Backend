@@ -2,7 +2,55 @@ ifndef::snippets[]
 :snippets: ./build/generated-snippets
 endif::[]
 
-= Spring Rest Docs
+= Party Quest REST API Documentation
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
 
-include::{snippets}/t1/http-request.adoc[]
-include::{snippets}/t1/http-response.adoc[]
+== Auth API
+
+=== LOGIN API
+
+==== HTTP Request Body
+include::{snippets}/login/http-request.adoc[]
+include::{snippets}/login/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/login/http-response.adoc[]
+include::{snippets}/login/response-body.adoc[]
+
+=== SIGN-UP API
+
+==== HTTP Request Body
+include::{snippets}/signup/http-request.adoc[]
+include::{snippets}/signup/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/signup/http-response.adoc[]
+include::{snippets}/signup/response-body.adoc[]
+
+
+== Party API
+
+=== Party Create API
+
+==== HTTP Request Body
+include::{snippets}/create_party/http-request.adoc[]
+include::{snippets}/create_party/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/create_party/http-response.adoc[]
+include::{snippets}/create_party/response-body.adoc[]
+
+=== Party Read API
+
+==== HTTP Request Body
+include::{snippets}/read_party_list/http-request.adoc[]
+include::{snippets}/read_party_list/query-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/read_party_list/http-response.adoc[]
+include::{snippets}/read_party_list/response-body.adoc[]
