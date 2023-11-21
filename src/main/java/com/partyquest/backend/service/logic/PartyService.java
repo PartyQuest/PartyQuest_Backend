@@ -8,7 +8,7 @@ public interface PartyService {
     CreatePartyDto.Response createParty(CreatePartyDto.Request request, long makerID);
     List<ReadPartyDto.Response> readPartyDto(String master, String title, Long id);
     ReadPartyDto.Response readPartyDto(long id);
-
+    ApplicationPartyDto.Response ApplicationParty(ApplicationPartyDto.Request requestDto);
 
     boolean deleteParty(List<Long> partyIds);
 }

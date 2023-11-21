@@ -107,4 +107,27 @@ public class PartyDto {
 
         }
     }
+    @Data
+    @Builder
+    public static class ApplicationPartyDto {
+        @Data
+        @Builder
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class Request {
+            private String partyName;
+            private Long partId;
+            private Long userId;
+        }
+
+        @Data
+        @Builder
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class Response {
+            private Long userPartyId;
+            private Long userId;
+            private Long partyId;
+        }
+    }
 }

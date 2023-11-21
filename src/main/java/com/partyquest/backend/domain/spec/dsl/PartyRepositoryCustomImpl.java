@@ -78,6 +78,8 @@ public class PartyRepositoryCustomImpl implements PartyRepositoryCustom {
         );
     }
 
+
+
     private BooleanExpression masterEq(String master) {
         return master != null? userParty.memberGrade.eq(PartyMemberType.MASTER).and(user.nickname.eq(master)) : null;
     }

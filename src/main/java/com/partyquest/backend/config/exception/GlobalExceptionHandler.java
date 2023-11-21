@@ -50,4 +50,18 @@ public class GlobalExceptionHandler {
         ErrorResponse response = new ErrorResponse(ErrorCode.INTER_SERVER_ERROR);
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(PartyNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handlePartyNotFoundException(PartyNotFoundException ex) {
+        log.error("handlePartyNotFoundException",ex);
+        ErrorResponse response = new ErrorResponse(ex.getErrorCode());
+        return new ResponseEntity<>(response,HttpStatus.valueOf(ex.getErrorCode().getStatus()));
+    }
+
+    @ExceptionHandler(PartyApplicationDuplicateException.class)
+    public ResponseEntity<ErrorResponse> handlePartyApplicationDuplicationException(PartyApplicationDuplicateException ex) {
+        log.error("handlePartyApplicationDuplication",ex);
+        ErrorResponse response = new ErrorResponse(ex.getErrorCode());
+        return new ResponseEntity<>(response,HttpStatus.valueOf(ex.getErrorCode().getStatus()));
+    }
 }

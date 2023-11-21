@@ -40,4 +40,12 @@ public class PartyController {
         List<PartyDto.ReadPartyDto.Response> responses = partyService.readPartyDto(master, title, pId);
         return ResponseEntityFactory.okResponse(responses);
     }
+
+    @PostMapping("/application")
+    public ResponseEntity<?> ApplicationPartyController(@AuthenticationPrincipal long id,
+                                                        @RequestBody PartyDto.ApplicationPartyDto.Request dto)
+    {
+        PartyDto.ApplicationPartyDto.Response response = partyService.ApplicationParty(dto);
+        return ResponseEntityFactory.okResponse(response);
+    }
 }

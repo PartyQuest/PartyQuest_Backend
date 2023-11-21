@@ -6,7 +6,7 @@ import com.partyquest.backend.config.exception.EnumTypeNotMatchedException;
 import com.partyquest.backend.config.exception.ErrorCode;
 
 public enum PartyMemberType {
-    MASTER,ADMIN,MEMBER;
+    MASTER,ADMIN,MEMBER,NO_MEMBER;
 
     @JsonCreator
     public static PartyMemberType fromString(String s) {

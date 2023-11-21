@@ -2,6 +2,8 @@ package com.partyquest.backend.service.impl;
 
 import com.partyquest.backend.config.exception.EmailNotFoundException;
 import com.partyquest.backend.config.exception.ErrorCode;
+import com.partyquest.backend.config.exception.PartyApplicationDuplicateException;
+import com.partyquest.backend.config.exception.PartyNotFoundException;
 import com.partyquest.backend.domain.dto.PartyDto;
 import com.partyquest.backend.domain.entity.File;
 import com.partyquest.backend.domain.entity.Party;
@@ -164,6 +166,50 @@ public class PartyServiceImpl implements PartyService {
     @Override
     public PartyDto.ReadPartyDto.Response readPartyDto(long id) {
         return null;
+    }
+
+    @Override
+    public ApplicationPartyDto.Response ApplicationParty(ApplicationPartyDto.Request requestDto) {
+        Optional<User> optUser = userRepository.findById(requestDto.getUserId());
+        Optional<Party> optParty = partyRepository.getParty(requestDto.getPartId());
+        if(optUser.isEmpty()) throw new EmailNotFoundException("NOT FOUND USER",ErrorCode.EMAIL_NOT_FOUND);
+        if(optParty.isEmpty()) throw new PartyNotFoundException("NOT FOUND PARTY",ErrorCode.PARTY_NOT_FOUND);
+
+        User user = optUser.get();
+        Party party = optParty.get();
+
+        Optional<UserParty> optUserParty = userPartyRepository.existEntryUser(party,user);
+        UserParty userParty;
+        if(optUserParty.isPresent()) {
+            userParty = optUserParty.get();
+            log.info(userParty.getMemberGrade().toString());
+            if(userParty.getIsDelete()) {
+                userParty.setIsDelete(false);
+                userPartyRepository.save(userParty);
+            } else {
+                throw new PartyApplicationDuplicateException(ErrorCode.PARTY_APPLICATION_DUPLICATED,"ALREADY APPLICATED USER");
+            }
+        } else {
+            userParty = UserParty.builder()
+                    .partyAdmin(false)
+                    .party(party)
+                    .user(user)
+                    .registered(false)
+                    .memberGrade(PartyMemberType.NO_MEMBER)
+                    .build();
+            userParty = userPartyRepository.save(userParty);
+
+            user.getUserParties().add(userParty);
+            party.getUserParties().add(userParty);
+        }
+
+        ApplicationPartyDto.Response response = ApplicationPartyDto.Response.builder()
+                .partyId(party.getId())
+                .userPartyId(userParty.getId())
+                .userId(userParty.getId())
+                .build();
+
+        return response;
     }
 
     @Override

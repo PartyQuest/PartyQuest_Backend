@@ -15,11 +15,13 @@ import com.partyquest.backend.domain.type.FileType;
 import com.partyquest.backend.domain.type.PartyMemberType;
 import com.partyquest.backend.service.logic.AuthService;
 import com.partyquest.backend.service.logic.PartyService;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -202,5 +204,54 @@ class PartyServiceImplTest {
         partyRepository.deleteAll();
         userPartyRepository.deleteAll();
         fileRepository.deleteAll();
+    }
+
+    @Test
+    @DisplayName("APPLICATION_PARTY_SERVICE")
+    @Transactional
+    void ApplicationParty() {
+        AuthDto.SignupResponseDto signupResponseDto1 = authService.SignUp(AuthDto.SignupDto.builder()
+                .email("tester01")
+                .nickname("test01")
+                .password("pass")
+                .build(), "LOCAL");
+        AuthDto.SignupResponseDto signupResponseDto2 = authService.SignUp(AuthDto.SignupDto.builder()
+                .email("tester02")
+                .nickname("test02")
+                .password("pass")
+                .build(), "LOCAL");
+        Party party = new Party(0L, "testCode", "title", "test", 20, true, new ArrayList<>(), null);
+        party = partyRepository.save(party);
+
+        User user1 = userRepository.findById(signupResponseDto1.getId()).get();
+        User user2 = userRepository.findById(signupResponseDto2.getId()).get();
+
+        UserParty userParty = UserParty.builder()
+                .memberGrade(PartyMemberType.MASTER)
+                .partyAdmin(true)
+                .party(party)
+                .registered(true)
+                .user(user1)
+                .build();
+
+        userPartyRepository.save(userParty);
+
+        user1.getUserParties().add(userParty);
+        party.getUserParties().add(userParty);
+
+
+        PartyDto.ApplicationPartyDto.Response response = partyService.ApplicationParty(PartyDto.ApplicationPartyDto.Request.builder()
+                .partyName("title")
+                .partId(party.getId())
+                .userId(user2.getId())
+                .build());
+
+        System.out.println(response.getPartyId() + " " + response.getUserPartyId() + " " + response.getUserId());
+        List<UserParty> testParty = userPartyRepository.findByParty(party);
+        for(UserParty up : testParty) {
+            System.out.println(up.getUser().getEmail() + " : " + up.getMemberGrade() + "\t"+"REGISTERED: "+up.isRegistered());
+        }
+        Long member = userPartyRepository.countPartyMember(party);
+        System.out.println(member);
     }
 }
