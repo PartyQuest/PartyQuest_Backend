@@ -173,7 +173,9 @@ class PartyControllerTest {
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestFields(
-                                fieldWithPath("partyName")
+                                fieldWithPath("partyName").type(JsonFieldType.STRING).description("Party Name"),
+                                fieldWithPath("partId").type(JsonFieldType.NUMBER).description("Party ID"),
+                                fieldWithPath("userId").type(JsonFieldType.NUMBER).description("User ID")
                         )
                 )
                 )
