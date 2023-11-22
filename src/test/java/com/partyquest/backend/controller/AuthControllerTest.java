@@ -1,5 +1,6 @@
 package com.partyquest.backend.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.partyquest.backend.domain.dto.AuthDto;
 import com.partyquest.backend.service.logic.AuthService;
@@ -17,6 +18,8 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -97,5 +100,33 @@ class AuthControllerTest {
                 )))
                 .andDo(print()).andExpect(status().isOk());
 
+    }
+    @Test
+    @DisplayName("OAUTH_LOGIN")
+    void OAuthLoginTest() throws Exception {
+        AuthDto.OAuthLogin.Request request = AuthDto.OAuthLogin.Request.builder()
+                .email("testEmail")
+                .nickname("nickname")
+                .secrets("$2a$10$ijPd8VVjA1r2UdmyOntpdOSyO4mUHd1xeWfuB5aGzWe3jUrYVuYB2")
+                .build();
+
+        mockMvc.perform(RestDocumentationRequestBuilders
+                .post("/auth/login/oauth/{provider}","oauthProvider")
+                .contentType("application/json")
+                .accept("application/json")
+                .content(objectMapper.writeValueAsString(request))
+        ).andDo(
+                document(
+                        "OAuthLogin",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("email").type(JsonFieldType.STRING).description("OAuth User Email"),
+                                fieldWithPath("nickname").type(JsonFieldType.STRING).description("OAuth User nickname"),
+                                fieldWithPath("secrets").type(JsonFieldType.STRING).description("OAuth Client-Server connect secret key")
+                        ),
+                        pathParameters(parameterWithName("provider").description("OAuth Provider"))
+                )
+        ).andDo(print()).andExpect(status().isOk());
     }
 }
