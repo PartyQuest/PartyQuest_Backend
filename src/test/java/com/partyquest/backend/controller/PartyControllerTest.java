@@ -1,7 +1,9 @@
 package com.partyquest.backend.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.partyquest.backend.config.WithAccount;
+import com.partyquest.backend.domain.dto.PartyDto;
 import com.partyquest.backend.domain.entity.File;
 import com.partyquest.backend.domain.entity.Party;
 import com.partyquest.backend.domain.entity.User;
@@ -123,5 +125,58 @@ class PartyControllerTest {
                         )
                 )
         ).andDo(print()).andExpect(status().isOk());
+    }
+
+    @WithAccount("email1")
+    void createParty() throws Exception {
+        CreatePartyDto.Request clientRequest = CreatePartyDto.Request.builder()
+                .title("title")
+                .isPublic(true)
+                .description("description")
+                .build();
+
+        mockMvc.perform(RestDocumentationRequestBuilders
+                .post("/party")
+                .contentType("application/json")
+                .accept("application/json")
+                .content(objectMapper.writeValueAsString(clientRequest))
+        ).andDo(print()).andExpect(status().isCreated());
+    }
+
+    @Test
+    @DisplayName("APPLICATION_PARTY")
+    @WithAccount("email2")
+    void applicationParty() throws Exception {
+        createParty();
+        User user = User.builder()
+                .deviceTokens(null)
+                .password("password")
+                .email("email")
+                .nickname("nickname")
+                .build();
+        User save = userRepository.save(user);
+
+        PartyDto.ApplicationPartyDto.Request request = ApplicationPartyDto.Request.builder()
+                .partyName("title")
+                .partId(1L)
+                .userId(save.getId())
+                .build();
+
+        mockMvc.perform(RestDocumentationRequestBuilders
+                .post("/party/application")
+                .contentType("application/json")
+                .accept("application/json")
+                .content(objectMapper.writeValueAsString(request))
+        ).andDo(
+                document(
+                        "application_party",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("partyName")
+                        )
+                )
+                )
+                .andDo(print());
     }
 }
