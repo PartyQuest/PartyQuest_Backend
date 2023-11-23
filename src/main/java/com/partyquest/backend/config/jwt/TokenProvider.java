@@ -1,10 +1,12 @@
 package com.partyquest.backend.config.jwt;
 
+import com.partyquest.backend.config.exception.ErrorCode;
 import com.partyquest.backend.config.redis.RedisDao;
 import com.partyquest.backend.domain.entity.User;
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -15,7 +17,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 @Component
+@Slf4j
 public class TokenProvider {
+
     @Value("${spring.jwt.secret}")
     private String jwtToken;
 
@@ -26,58 +30,32 @@ public class TokenProvider {
         this.redisDao = redisDao;
     }
 
-    private Boolean checkExpiration(String token) {
+    private Claims parseClaims(String token) {
+        return Jwts.parser().setSigningKey(jwtToken).parseClaimsJws(token).getBody();
+    }
+
+    private Claims validateToken(String token) {
+        Claims claims = null;
         try {
-            Jws<Claims> claims = Jwts.parser().setSigningKey(jwtToken).parseClaimsJws(token);
-            return claims.getBody().getExpiration().before(new Date());
-        } catch (ExpiredJwtException eje) {
-            return false;
+            claims = parseClaims(token);
+        } catch (MalformedJwtException e) {
+            log.error("MalformedJwtException",e);
+            throw new JwtException(ErrorCode.JWT_TOKEN_MALFORMED.getMessage());
+        } catch (ExpiredJwtException e) {
+            log.error("ExpiredJwtException",e);
+            throw new JwtException(ErrorCode.JWT_TOKEN_EXPIRED.getMessage());
+        } catch (SignatureException e) {
+            log.error("SignatureException",e);
+            throw new JwtException(ErrorCode.JWT_TOKEN_WRONG_TYPE.getMessage());
         }
+        return claims;
     }
-    private boolean existsRefreshToken(String refreshToken,long userId) {
-        if(redisDao.getValue(Long.toString(userId)) != null) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-    private Long getRefreshToken(HttpServletResponse response, String refreshToken) {
-        long userId = Long.parseLong(Jwts.parser().setSigningKey(jwtToken).parseClaimsJws(refreshToken).getBody().getSubject());
-        if(checkExpiration(refreshToken) && existsRefreshToken(refreshToken,userId)) {
-            Claims claims = Jwts.claims().setSubject(Long.toString(userId));
-            String newAccessToken = tokenBuilder(1,ChronoUnit.HOURS,claims,new Date());
-            response.setHeader("Authorization","Bearer "+newAccessToken);
-            return userId;
-        }
-        return null;
-    }
-    private Long validate(HttpServletRequest request, HttpServletResponse response) {
-        String accessToken = request.getHeader("Authorization").substring(7);
-        String refreshToken = request.getHeader("RefreshToken");
 
-        if(checkExpiration(accessToken)) {
-            return Long.parseLong(Jwts.parser().setSigningKey(jwtToken).parseClaimsJws(accessToken).getBody().getSubject());
-        } else if (!checkExpiration(accessToken) && refreshToken != null) {
-           return getRefreshToken(response,refreshToken);
-        }
-        return null;
-    }
     public Long getUserId(HttpServletRequest request, HttpServletResponse response) {
-        Jws<Claims> accessClaims;
-        Jws<Claims> refreshClaims;
-
-        JwtParser jwtParser = Jwts.parser().setSigningKey(jwtToken);
-
-        Long userId = validate(request,response);
-        if(userId != null) {
-            return userId;
-        } else {
-            accessClaims = jwtParser.parseClaimsJws(request.getHeader("Authorization").substring(7));
-            refreshClaims = jwtParser.parseClaimsJws(request.getHeader("RefreshToken"));
-            return Long.parseLong(accessClaims.getBody().getSubject());
-        }
+        String token = request.getHeader("Authorization").substring(7);
+        Claims claims = validateToken(token);
+        return Long.parseLong(claims.getSubject());
     }
-
 
     private String tokenBuilder(int time, ChronoUnit chronoUnit, Claims claims, Date date) {
         return Jwts.builder()
@@ -92,9 +70,9 @@ public class TokenProvider {
         Claims claims = Jwts.claims().setSubject(Long.toString(user.getId()));
         Date now = new Date();
 
-        String accessToken = tokenBuilder(1,ChronoUnit.HOURS,claims,now);
-        String refreshToken = tokenBuilder(10,ChronoUnit.DAYS,claims,now);
-        redisDao.setValue(Long.toString(user.getId()),refreshToken,Duration.ofDays(21));
+        String accessToken = tokenBuilder(10,ChronoUnit.SECONDS,claims,now);
+        String refreshToken = tokenBuilder(30,ChronoUnit.SECONDS,claims,now);
+        redisDao.setValue(Long.toString(user.getId()),refreshToken, Duration.ofSeconds(30));
         return accessToken+"::"+refreshToken;
     }
 }

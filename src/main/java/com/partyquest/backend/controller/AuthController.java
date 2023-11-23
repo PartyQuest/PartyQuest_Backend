@@ -6,6 +6,7 @@ import com.partyquest.backend.service.impl.oauth2.AccessToken;
 import com.partyquest.backend.service.impl.oauth2.ProviderService;
 import com.partyquest.backend.service.impl.oauth2.profile.ProfileDto;
 import com.partyquest.backend.service.logic.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,5 +56,10 @@ public class AuthController {
     public ResponseEntity<?> OAuthLogin(@RequestBody AuthDto.OAuthLogin.Request dto, @PathVariable String provider) {
         AuthDto.LoginResponseDto result = authService.OAuth2Login(dto, provider);
         return ResponseEntityFactory.okResponse(result);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> RefreshToken(HttpServletRequest request, HttpServletResponse response) {
+        return ResponseEntityFactory.okResponse(authService.RefreshToken(request, response));
     }
 }

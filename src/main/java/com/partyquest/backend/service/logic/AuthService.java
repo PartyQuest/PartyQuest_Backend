@@ -2,6 +2,8 @@ package com.partyquest.backend.service.logic;
 
 import com.partyquest.backend.domain.dto.AuthDto;
 import com.partyquest.backend.domain.entity.User;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 
 public interface AuthService {
@@ -11,5 +13,7 @@ public interface AuthService {
     String getEmailById(long id);
     User getUserByEmail(String email);
     AuthDto.LoginResponseDto OAuth2Login(AuthDto.OAuthLogin.Request dto,String provider);
+
+    AuthDto.LoginResponseDto RefreshToken(HttpServletRequest request, HttpServletResponse response);
 
 }

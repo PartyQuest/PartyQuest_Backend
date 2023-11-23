@@ -50,6 +50,7 @@ public class AuthDto {
             BCryptService service = new BCryptService();
             String password = service.encodeBcrypt(signupDto.getPassword());
             return User.builder()
+                    .files(new LinkedList<>())
                     .userParties(new LinkedList<>())
                     .email(signupDto.getEmail())
                     .password(password)

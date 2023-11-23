@@ -4,6 +4,7 @@ package com.partyquest.backend.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.partyquest.backend.config.jwt.JwtAuthenticationEntryPoint;
 import com.partyquest.backend.config.jwt.JwtAuthenticationFilter;
+import com.partyquest.backend.config.jwt.JwtExceptionFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,14 +21,17 @@ public class SecurityConfig {
     private final ObjectMapper objectMapper;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtExceptionFilter jwtExceptionFilter;
 
 
     public SecurityConfig(ObjectMapper objectMapper,
                           JwtAuthenticationFilter jwtAuthenticationFilter,
-                          JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
+                          JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
+                          JwtExceptionFilter jwtExceptionFilter) {
         this.objectMapper = objectMapper;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+        this.jwtExceptionFilter = jwtExceptionFilter;
     }
 
     @Autowired
@@ -48,9 +52,10 @@ public class SecurityConfig {
                                 new AntPathRequestMatcher("/h2-console/**"),
                                 new AntPathRequestMatcher("/auth/**")
 //                                new AntPathRequestMatcher("/login/**")
-                        ).permitAll().anyRequest().authenticated())
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint));
+                        ).permitAll().anyRequest().authenticated());
+                //.exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint));
         http.addFilterAfter(jwtAuthenticationFilter, CorsFilter.class);
+        http.addFilterBefore(jwtExceptionFilter,JwtAuthenticationFilter.class);
         return http.build();
     }
 

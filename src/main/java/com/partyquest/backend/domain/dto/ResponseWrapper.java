@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +15,7 @@ import java.util.List;
 @Slf4j
 @Data
 public class ResponseWrapper<T> {
-    private LocalDate time;
+    private String time;
     private HttpStatus httpStatus;
     private List<T> data;
 
@@ -23,7 +25,7 @@ public class ResponseWrapper<T> {
         return ResponseWrapper.<T>builder()
                     .data(result)
                     .httpStatus(status)
-                    .time(LocalDate.now())
+                    .time(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                     .build();
     }
 }
