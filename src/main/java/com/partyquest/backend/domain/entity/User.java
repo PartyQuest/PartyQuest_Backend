@@ -34,4 +34,7 @@ public class User extends DataCheck {
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<DeviceToken> deviceTokens = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<File> files = new ArrayList<>();
+
 }

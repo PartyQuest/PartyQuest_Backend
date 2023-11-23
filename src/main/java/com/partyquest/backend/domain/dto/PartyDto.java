@@ -130,4 +130,18 @@ public class PartyDto {
             private Long partyId;
         }
     }
+
+    @Data
+    @Builder
+    public static class ReadApplicatorDto {
+        @Data
+        @Builder
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class Response {
+            private String userThumbnailPath;
+            private String nickname;
+            private boolean registered;
+        }
+    }
 }

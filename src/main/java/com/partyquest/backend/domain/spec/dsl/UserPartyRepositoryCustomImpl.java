@@ -1,8 +1,10 @@
 package com.partyquest.backend.domain.spec.dsl;
 
+import com.partyquest.backend.domain.dto.RepositoryDto;
 import com.partyquest.backend.domain.entity.Party;
 import com.partyquest.backend.domain.entity.User;
 import com.partyquest.backend.domain.entity.UserParty;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -12,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.partyquest.backend.domain.entity.QUserParty.userParty;
+import static com.partyquest.backend.domain.entity.QUser.user;
 
 
 @Repository
@@ -33,6 +36,13 @@ public class UserPartyRepositoryCustomImpl implements UserPartyRepositoryCustom{
                         userParty.party.eq(party),
                         userParty.registered.eq(true))
                 .fetchOne();
+    }
+
+    @Override
+    public List<RepositoryDto.UserApplicatorRepositoryDto> findApplicators(Party party) {
+        return jpaQueryFactory
+                .select(Projections.fields(RepositoryDto.UserApplicatorRepositoryDto.class, userParty.registered,userParty.user.nickname))
+                .from(userParty,user).where(userParty.user.eq(user)).fetch();
     }
 
     @Override

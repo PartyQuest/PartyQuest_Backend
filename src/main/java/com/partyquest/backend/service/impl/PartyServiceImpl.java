@@ -118,7 +118,7 @@ public class PartyServiceImpl implements PartyService {
 //        partySet.add(save);
 //        party.setUserParties(partySet);
 //
-//        //[TODO] 이미지 결정해서 서버에 추가해야함
+//        //TODO 임시로 넣은 파일 메타데이터, 실제 파일서비스 구현할 때 수정해야함!!!!!!!!!
 //        File file = File.builder()
 //                .type(FileType.PARTY_THUMBNAIL)
 //                .fileOriginalName("TEMP ORIGINAL NAME")

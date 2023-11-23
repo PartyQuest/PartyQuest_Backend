@@ -38,4 +38,8 @@ public class File extends DataCheck {
     @JoinColumn(name = "party_id")
     private Party party;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
 }
