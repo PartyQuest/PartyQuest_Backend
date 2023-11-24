@@ -144,4 +144,19 @@ public class PartyDto {
             private boolean registered;
         }
     }
+
+    @Data
+    @Builder
+    public static class MembershipPartyDto {
+        @Data
+        @Builder
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class Response {
+            private String partyThumbnailPath;
+            private String partyTitle;
+            private String partyMaster;
+            private long partyMemberCnt;
+        }
+    }
 }

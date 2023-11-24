@@ -1,7 +1,10 @@
 package com.partyquest.backend.controller;
 
+import com.partyquest.backend.config.JsonEnumTypeConfig;
 import com.partyquest.backend.config.ResponseEntityFactory;
 import com.partyquest.backend.domain.dto.PartyDto;
+import com.partyquest.backend.domain.dto.ResponseWrapper;
+import com.partyquest.backend.domain.type.PartyMemberType;
 import com.partyquest.backend.service.logic.PartyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,5 +50,23 @@ public class PartyController {
     {
         PartyDto.ApplicationPartyDto.Response response = partyService.ApplicationParty(dto);
         return ResponseEntityFactory.okResponse(response);
+    }
+
+    @GetMapping("/member")
+    public ResponseEntity<?> FindMemberFromGradeController
+            (
+                @AuthenticationPrincipal long id,
+                @RequestParam(value = "grade",required = false) String grade,
+                @RequestParam(value = "partyID") Long partyID
+            )
+    {
+        List<PartyDto.ReadApplicatorDto.Response> responses = partyService.getMemberFromGrade(partyID, JsonEnumTypeConfig.fromString(PartyMemberType.class, grade));
+        return ResponseEntityFactory.okResponse(responses);
+    }
+
+    @GetMapping("/my-parties")
+    public ResponseEntity<?> FindMyPartiesController(@AuthenticationPrincipal long id) {
+        List<PartyDto.MembershipPartyDto.Response> parties = partyService.getMembershipParties(id);
+        return ResponseEntityFactory.okResponse(parties);
     }
 }

@@ -5,6 +5,7 @@ import com.partyquest.backend.config.exception.ErrorCode;
 import com.partyquest.backend.config.exception.PartyApplicationDuplicateException;
 import com.partyquest.backend.config.exception.PartyNotFoundException;
 import com.partyquest.backend.domain.dto.PartyDto;
+import com.partyquest.backend.domain.dto.RepositoryDto;
 import com.partyquest.backend.domain.entity.File;
 import com.partyquest.backend.domain.entity.Party;
 import com.partyquest.backend.domain.entity.User;
@@ -228,5 +229,48 @@ public class PartyServiceImpl implements PartyService {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    @Override
+    public List<ReadApplicatorDto.Response> getMemberFromGrade(Long partyId, PartyMemberType grade) {
+        Optional<Party> optParty = partyRepository.findById(partyId);
+        if(optParty.isEmpty()) throw new PartyNotFoundException("NOT FOUND PARTY",ErrorCode.PARTY_NOT_FOUND);
+        Party party = optParty.get();
+
+        List<RepositoryDto.UserApplicatorRepositoryDto> members = userPartyRepository.findMemberFromGrade(party, grade);
+        log.info(members.toString());
+        List<Long> memberIds = new ArrayList<>();
+        for(RepositoryDto.UserApplicatorRepositoryDto member : members) {
+            memberIds.add(member.getId());
+        }
+
+        Map<Long, String> userImagePath = fileRepository.getUserImagePath(memberIds);
+        log.info(userImagePath.toString());
+        List<ReadApplicatorDto.Response> result = new ArrayList<>();
+        for(RepositoryDto.UserApplicatorRepositoryDto member : members) {
+            result.add(ReadApplicatorDto.Response.builder()
+                    .nickname(member.getNickname())
+                    .registered(member.isRegistered())
+                    .userThumbnailPath(userImagePath.get(member.getId())).build());
+        }
+        return result;
+    }
+
+    @Override
+    public List<MembershipPartyDto.Response> getMembershipParties(long userId) {
+        Optional<User> optUser = userRepository.findById(userId);
+        if(optUser.isEmpty()) throw new EmailNotFoundException("NOT FOUND USER",ErrorCode.EMAIL_NOT_FOUND);
+        List<RepositoryDto.MembershipDto> membershipDtoList = userPartyRepository.findMembershipUser(optUser.get());
+
+        List<MembershipPartyDto.Response> result = new ArrayList<>();
+        for(RepositoryDto.MembershipDto dto : membershipDtoList) {
+            result.add(MembershipPartyDto.Response.builder()
+                    .partyMaster(dto.getPartyMaster())
+                    .partyMemberCnt(dto.getPartyMemberCnt())
+                    .partyThumbnailPath(dto.getPartyThumbnailPath())
+                    .partyTitle(dto.getPartyTitle())
+                    .build());
+        }
+        return result;
     }
 }

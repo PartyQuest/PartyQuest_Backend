@@ -254,4 +254,70 @@ class PartyServiceImplTest {
         Long member = userPartyRepository.countPartyMember(party);
         System.out.println(member);
     }
+
+    @Test
+    @DisplayName("MEMBERSHIP_USER_SERVICE_TEST")
+    void membershipUserTest() {
+
+        User user = userRepository.save(
+                User.builder()
+                        .files(new LinkedList<>())
+                        .nickname("user")
+                        .email("user@example.com")
+                        .password("password")
+                        .deviceTokens(new LinkedList<>())
+                        .userParties(new LinkedList<>())
+                        .sns("LOCAL")
+                        .build());
+        File file = fileRepository.save(
+                File.builder()
+                        .fileSize(1234L)
+                        .type(FileType.USER_THUMBNAIL)
+                        .fileOriginalName("testOriginName")
+                        .filePath("testFilePath")
+                        .fileAttachChngName("testAttachChngName")
+                        .user(user)
+                        .build());
+        user.getFiles().add(file);
+        for(int i = 0; i < 10; i++) {
+            Party party = partyRepository.save(Party.builder()
+                    .description("The name of the des")
+                    .files(new LinkedList<>())
+                    .isPublic(true)
+                    .title("title"+i)
+                    .capabilities(20)
+                    .build());
+
+            File file2 = fileRepository.save(
+                    File.builder()
+                            .fileSize(1234L)
+                            .type(FileType.PARTY_THUMBNAIL)
+                            .fileOriginalName("testOriginName")
+                            .filePath("testFilePath1234")
+                            .fileAttachChngName("testAttachChngName")
+                            .party(party)
+                            .build());
+            party.getFiles().add(file2);
+
+            UserParty userParty = userPartyRepository.save(
+                    UserParty.builder()
+                            .partyAdmin(true)
+                            .user(user)
+                            .registered(true)
+                            .memberGrade(PartyMemberType.MASTER)
+                            .party(party)
+                            .build());
+            UserParty userParty2 = userPartyRepository.save(
+                    UserParty.builder()
+                            .partyAdmin(true)
+                            .user(user)
+                            .registered(true)
+                            .memberGrade(PartyMemberType.MASTER)
+                            .party(party)
+                            .build());
+        }
+
+        List<PartyDto.MembershipPartyDto.Response> list = partyService.getMembershipParties(user.getId());
+        System.out.println(list.toString());
+    }
 }

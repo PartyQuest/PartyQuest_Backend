@@ -3,7 +3,6 @@ package com.partyquest.backend.config;
 import com.partyquest.backend.config.jwt.TokenProvider;
 import com.partyquest.backend.domain.entity.User;
 import com.partyquest.backend.domain.repository.UserRepository;
-import com.partyquest.backend.service.logic.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

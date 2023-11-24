@@ -1,19 +1,13 @@
 package com.partyquest.backend.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.partyquest.backend.config.WithAccount;
 import com.partyquest.backend.domain.dto.PartyDto;
-import com.partyquest.backend.domain.entity.File;
-import com.partyquest.backend.domain.entity.Party;
 import com.partyquest.backend.domain.entity.User;
-import com.partyquest.backend.domain.entity.UserParty;
 import com.partyquest.backend.domain.repository.FileRepository;
 import com.partyquest.backend.domain.repository.PartyRepository;
 import com.partyquest.backend.domain.repository.UserPartyRepository;
 import com.partyquest.backend.domain.repository.UserRepository;
-import com.partyquest.backend.domain.type.FileType;
-import com.partyquest.backend.domain.type.PartyMemberType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +18,6 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.LinkedList;
-
-import static org.junit.jupiter.api.Assertions.*;
 import static com.partyquest.backend.domain.dto.PartyDto.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
@@ -180,5 +171,37 @@ class PartyControllerTest {
                 )
                 )
                 .andDo(print());
+    }
+
+    @Test
+    @DisplayName("APPLICATIOR LIST")
+    @WithAccount("email3")
+    void applicator() throws Exception {
+        createParty();
+        User user = User.builder()
+                .deviceTokens(null)
+                .password("password")
+                .email("email4")
+                .nickname("nickname")
+                .build();
+        User save = userRepository.save(user);
+        PartyDto.ApplicationPartyDto.Request request = ApplicationPartyDto.Request.builder()
+                .partyName("title")
+                .partId(1L)
+                .userId(save.getId())
+                .build();
+
+        mockMvc.perform(RestDocumentationRequestBuilders
+                        .post("/party/application")
+                        .contentType("application/json")
+                        .accept("application/json")
+                        .content(objectMapper.writeValueAsString(request))
+                ).andDo(print());
+
+        mockMvc.perform(RestDocumentationRequestBuilders
+                .get("/party/member?grade=NO_MEMBER&partyID=1")
+                .contentType("application/json")
+                .accept("application/json")
+        ).andDo(print());
     }
 }
