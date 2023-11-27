@@ -70,8 +70,8 @@ public class TokenProvider {
         Claims claims = Jwts.claims().setSubject(Long.toString(user.getId()));
         Date now = new Date();
 
-        String accessToken = tokenBuilder(10,ChronoUnit.SECONDS,claims,now);
-        String refreshToken = tokenBuilder(30,ChronoUnit.SECONDS,claims,now);
+        String accessToken = tokenBuilder(1,ChronoUnit.HOURS,claims,now);
+        String refreshToken = tokenBuilder(30,ChronoUnit.DAYS,claims,now);
         redisDao.setValue(Long.toString(user.getId()),refreshToken, Duration.ofSeconds(30));
         return accessToken+"::"+refreshToken;
     }
