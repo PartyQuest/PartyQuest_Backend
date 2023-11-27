@@ -22,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 @Service
@@ -163,7 +165,13 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private AuthDto.LoginResponseDto TokenDtoBuilder(String[] tokens, String email) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime accessExpired = now.plusHours(1);
+        LocalDateTime refreshExpired = now.plusMonths(1);
+
         return AuthDto.LoginResponseDto.builder()
+                .accessExpiredAt(accessExpired.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .refreshExpiredAt(refreshExpired.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                 .email(email)
                 .refreshToken(tokens[1])
                 .accessToken(tokens[0])

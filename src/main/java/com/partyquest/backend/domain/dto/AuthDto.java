@@ -81,6 +81,8 @@ public class AuthDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class LoginResponseDto {
+        private String accessExpiredAt;
+        private String refreshExpiredAt;
         private String accessToken;
         private String refreshToken;
         private String email;
