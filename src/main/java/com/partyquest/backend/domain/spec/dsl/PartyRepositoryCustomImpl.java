@@ -67,7 +67,7 @@ public class PartyRepositoryCustomImpl implements PartyRepositoryCustom {
     }
 
     @Override
-    public RepositoryDto.ReadPartyVO getPartiesTmp(Long id) {
+    public RepositoryDto.ReadPartyVO getPartiesTmp(long id) {
         return jpaQueryFactory
                 .select(
                         Projections.constructor(

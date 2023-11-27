@@ -92,8 +92,8 @@ class PartyRepositoryCustomImplTest {
             System.out.println(dto.toString());
         }
         System.out.println();
-        RepositoryDto.ReadPartyVO vo = partyRepository.getPartiesTmp(1L);
-        System.out.println(vo.toString());
+//        RepositoryDto.ReadPartyVO vo = partyRepository.getPartiesTmp(1);
+//        System.out.println(vo.toString());
 
         userRepository.deleteAll();
         fileRepository.deleteAll();

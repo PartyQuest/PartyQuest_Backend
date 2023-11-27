@@ -13,5 +13,5 @@ public interface PartyRepositoryCustom {
     List<RepositoryDto.ReadPartiesVO> getPartiesTmp(String master, String title, Long id);
     Optional<Party> getParty(long id);
     String findMasterNameByParty(Party searchParty);
-    RepositoryDto.ReadPartyVO getPartiesTmp(Long id);
+    RepositoryDto.ReadPartyVO getPartiesTmp(long id);
 }
