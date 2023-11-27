@@ -94,18 +94,10 @@ class PartyRepositoryCustomImplTest {
         System.out.println();
         RepositoryDto.ReadPartyVO vo = partyRepository.getPartiesTmp(1L);
         System.out.println(vo.toString());
-//        List<Party> parties = partyRepository.getParties(null,null,null);
-//        System.out.println(parties.size());
-//        User user1 = parties.get(0).getUserParties().get(0).getUser();
-//        //File file = parties.get(0).getFiles().get(0);
-//        //System.out.println(parties.get(0).getFiles().size());
-//        //List<File> files = fileRepository.findByParty(parties.get(0));
-//
-//        assertAll(
-//                () -> assertEquals(user1.getNickname(), "nickname"),
-//                () -> assertEquals(user1.getSns(), "LOCAL"),
-//                () -> assertEquals(user1.getPassword(), "password")
-////                () -> assertEquals(parties.get(0).getFiles().size(), 2)
-//        );
+
+        userRepository.deleteAll();
+        fileRepository.deleteAll();
+        userPartyRepository.deleteAll();
+        partyRepository.deleteAll();
     }
 }

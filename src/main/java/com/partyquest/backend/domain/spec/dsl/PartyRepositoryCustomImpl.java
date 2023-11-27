@@ -89,7 +89,7 @@ public class PartyRepositoryCustomImpl implements PartyRepositoryCustom {
                 .where(
                         party.isPublic.eq(true),
                         party.isDelete.eq(false),
-                        partyIdEq(id)
+                        party.id.eq(id)
                 ).fetchOne();
     }
 

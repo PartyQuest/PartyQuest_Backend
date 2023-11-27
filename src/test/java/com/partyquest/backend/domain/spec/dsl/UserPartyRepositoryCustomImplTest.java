@@ -157,5 +157,9 @@ public class UserPartyRepositoryCustomImplTest {
         List<RepositoryDto.MembershipDto> membershipUser = userPartyRepository.findMembershipUser(user);
         System.out.println(objectMapper.writeValueAsString(membershipUser));
 
+        userRepository.deleteAll();
+        fileRepository.deleteAll();
+        userPartyRepository.deleteAll();
+        partyRepository.deleteAll();
     }
 }

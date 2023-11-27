@@ -256,6 +256,11 @@ class PartyServiceImplTest {
         }
         Long member = userPartyRepository.countPartyMember(party);
         System.out.println(member);
+
+        userRepository.deleteAll();
+        partyRepository.deleteAll();
+        userPartyRepository.deleteAll();
+        fileRepository.deleteAll();
     }
 
     @Test
@@ -322,5 +327,10 @@ class PartyServiceImplTest {
 
         List<PartyDto.MembershipPartyDto.Response> list = partyService.getMembershipParties(user.getId());
         System.out.println(list.toString());
+
+        userRepository.deleteAll();
+        partyRepository.deleteAll();
+        userPartyRepository.deleteAll();
+        fileRepository.deleteAll();
     }
 }
