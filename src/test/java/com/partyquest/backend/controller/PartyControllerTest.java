@@ -103,7 +103,7 @@ class PartyControllerTest {
 
 
         mockMvc.perform(RestDocumentationRequestBuilders
-                .get("/party?master=tmp&title=tmp&id=1234")
+                .get("/party?master=nickname&title=title&id=1")
         ).andDo(
                 document(
                         "read_party_list",

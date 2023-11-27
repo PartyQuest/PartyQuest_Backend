@@ -1,6 +1,7 @@
 package com.partyquest.backend.domain.spec.dsl;
 
 import com.partyquest.backend.domain.dto.PartyDto;
+import com.partyquest.backend.domain.dto.RepositoryDto;
 import com.partyquest.backend.domain.entity.Party;
 
 import java.util.List;
@@ -10,6 +11,7 @@ public interface PartyRepositoryCustom {
     List<Party> findByTitle(String title);
     //List<PartyDto.ReadPartyDto.Response> getParties(String master, String title, Long id);
     List<Party> getParties(String master, String title, Long id);
+    List<RepositoryDto.ReadPartiesVO> getPartiesTmp(String master, String title, Long id);
     Optional<Party> getParty(long id);
     String findMasterNameByParty(Party searchParty);
 }

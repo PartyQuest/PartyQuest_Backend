@@ -38,4 +38,16 @@ public class RepositoryDto {
         private String partyMaster;
         private long partyMemberCnt;
     }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReadPartiesVO {
+        private String partyThumbnailPath;
+        private String partyTitle;
+        private long partyId;
+        private String partyMaster;
+        private long partyMemberCnt;
+    }
 }

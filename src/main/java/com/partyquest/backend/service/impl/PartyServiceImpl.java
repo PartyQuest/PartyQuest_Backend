@@ -85,83 +85,25 @@ public class PartyServiceImpl implements PartyService {
         party.getFiles().add(file);
 
         return PartyDto.CreatePartyDto.Response.entityToDto(party);
-
-
-
-//
-//        //Party Entity 생성
-//        Party party = PartyDto.CreatePartyDto.Request.dtoToEntity(request);
-//        Party partySave = partyRepository.save(party);
-//        //파티 생성자(마스터) 계정정보 호출
-//        User user;
-//        Optional<User> optionalUser = userRepository.findById(makerID);
-//        if(optionalUser.isEmpty()) throw new EmailNotFoundException("USER NOT FOUND", ErrorCode.EMAIL_NOT_FOUND);
-//        else user = optionalUser.get();
-//
-//        //연결 테이블 UserParty 계정-파티 연결
-//        UserParty userParty = UserParty.builder()
-//                .user(user)
-//                .party(partySave)
-//                .partyAdmin(true)
-//                .memberGrade(PartyMemberType.MASTER)
-//                .registered(true)
-//                .build();
-//        UserParty save = userPartyRepository.save(userParty);
-//
-//        // User - UserParty - Party 연결
-//        //User 연결
-//        List<UserParty> parties = user.getUserParties();
-//        parties.add(save);
-//        user.setUserParties(parties);
-//
-////        party 연결
-//        List<UserParty> partySet = party.getUserParties();
-//        partySet.add(save);
-//        party.setUserParties(partySet);
-//
-//        //TODO 임시로 넣은 파일 메타데이터, 실제 파일서비스 구현할 때 수정해야함!!!!!!!!!
-//        File file = File.builder()
-//                .type(FileType.PARTY_THUMBNAIL)
-//                .fileOriginalName("TEMP ORIGINAL NAME")
-//                .filePath("TEMP PATH")
-//                .fileAttachChngName("TEMP")
-//                .party(partySave)
-//                .build();
-//
-//        return PartyDto.CreatePartyDto.Response.entityToDto(party);
     }
 
     //검색 키워드, 파티이름, 파티장
     @Override
     public List<PartyDto.ReadPartyDto.Response> readPartyDto(String master, String title, Long id) {
-        List<Party> parties = partyRepository.getParties(master, title, id);
-        return parties.stream()
-                .map(party -> {
-                    String thumbnailPath = party.getFiles().stream()
-                            .filter(file -> file.getType() == FileType.PARTY_THUMBNAIL)
-                            .map(File::getFilePath)
-                            .findFirst()
-                            .orElse(null);
-
-                    String partyMaster = party.getUserParties().stream()
-                            .filter(userParty -> userParty.getMemberGrade() == PartyMemberType.MASTER)
-                            .map(UserParty::getUser)
-                            .filter(user -> master == null || user.getNickname().equals(master))
-                            .map(User::getNickname)
-                            .findFirst().orElse(null);
-
-                    log.info(partyMaster);
-
-                    return ReadPartyDto.Response.builder()
-                            .thumbnailPath(thumbnailPath)
-                            .id(party.getId())
-                            .partyMaster(partyMaster)
-                            .capability(party.getCapabilities())
-                            .description(party.getDescription())
-                            .title(party.getTitle())
-                            .build();
-                })
-                .collect(Collectors.toList());
+        List<RepositoryDto.ReadPartiesVO> voList = partyRepository.getPartiesTmp(master, title, id);
+        List<ReadPartyDto.Response> result = new ArrayList<>();
+        for(RepositoryDto.ReadPartiesVO vo : voList) {
+            result.add(
+                    ReadPartyDto.Response.builder()
+                            .title(vo.getPartyTitle())
+                            .partyMaster(vo.getPartyMaster())
+                            .capability((int)vo.getPartyMemberCnt())
+                            .thumbnailPath(vo.getPartyThumbnailPath())
+                            .id(vo.getPartyId())
+                            .build()
+            );
+        }
+        return result;
     }
 
     @Override

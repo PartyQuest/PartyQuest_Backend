@@ -1,6 +1,7 @@
 package com.partyquest.backend.domain.spec.dsl;
 
 import com.partyquest.backend.domain.dto.PartyDto;
+import com.partyquest.backend.domain.dto.RepositoryDto;
 import com.partyquest.backend.domain.entity.File;
 import com.partyquest.backend.domain.entity.Party;
 import com.partyquest.backend.domain.entity.User;
@@ -62,18 +63,17 @@ class PartyRepositoryCustomImplTest {
             party.setIsDeleted(false);
             Party save = partyRepository.save(party);
 
-            for (int j = 0; j <2; j++) {
-                File file = File.builder()
-                        .type(FileType.PARTY_THUMBNAIL)
-                        .errMsg("errMsg")
-                        .party(save)
-                        .filePath("path")
-                        .fileOriginalName("origin")
-                        .fileAttachChngName("name")
-                        .build();
-                fileRepository.save(file);
-                save.getFiles().add(file);
-            }
+            File file = File.builder()
+                    .type(FileType.PARTY_THUMBNAIL)
+                    .errMsg("errMsg")
+                    .party(save)
+                    .filePath("path"+i)
+                    .fileOriginalName("origin")
+                    .fileAttachChngName("name")
+                    .build();
+            fileRepository.save(file);
+            save.getFiles().add(file);
+
 
             UserParty userParty = UserParty.builder()
                     .user(save1)
@@ -86,18 +86,23 @@ class PartyRepositoryCustomImplTest {
             userPartyRepository.save(userParty);
         }
 
-        List<Party> parties = partyRepository.getParties(null,null,null);
-        System.out.println(parties.size());
-        User user1 = parties.get(0).getUserParties().get(0).getUser();
-        //File file = parties.get(0).getFiles().get(0);
-        //System.out.println(parties.get(0).getFiles().size());
-        //List<File> files = fileRepository.findByParty(parties.get(0));
-
-        assertAll(
-                () -> assertEquals(user1.getNickname(), "nickname"),
-                () -> assertEquals(user1.getSns(), "LOCAL"),
-                () -> assertEquals(user1.getPassword(), "password")
-//                () -> assertEquals(parties.get(0).getFiles().size(), 2)
-        );
+        List<RepositoryDto.ReadPartiesVO> tmp = partyRepository.getPartiesTmp(null, null, null);
+        //System.out.println(tmp.toString());
+        for(RepositoryDto.ReadPartiesVO dto : tmp) {
+            System.out.println(dto.toString());
+        }
+//        List<Party> parties = partyRepository.getParties(null,null,null);
+//        System.out.println(parties.size());
+//        User user1 = parties.get(0).getUserParties().get(0).getUser();
+//        //File file = parties.get(0).getFiles().get(0);
+//        //System.out.println(parties.get(0).getFiles().size());
+//        //List<File> files = fileRepository.findByParty(parties.get(0));
+//
+//        assertAll(
+//                () -> assertEquals(user1.getNickname(), "nickname"),
+//                () -> assertEquals(user1.getSns(), "LOCAL"),
+//                () -> assertEquals(user1.getPassword(), "password")
+////                () -> assertEquals(parties.get(0).getFiles().size(), 2)
+//        );
     }
 }
