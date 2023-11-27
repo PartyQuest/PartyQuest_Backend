@@ -215,4 +215,17 @@ public class PartyServiceImpl implements PartyService {
         }
         return result;
     }
+
+    @Override
+    public ReadPartyDto.Response readPartySpecification(Long id) {
+        RepositoryDto.ReadPartyVO vo = partyRepository.getPartiesTmp(id);
+        return ReadPartyDto.Response.builder()
+                .thumbnailPath(vo.getPartyThumbnailPath())
+                .description(vo.getDescription())
+                .capability((int)vo.getPartyMemberCnt())
+                .partyMaster(vo.getPartyMaster())
+                .id(vo.getPartyId())
+                .title(vo.getPartyTitle())
+                .build();
+    }
 }

@@ -101,6 +101,9 @@ class PartyControllerTest {
                 )
         ).andDo(print()).andExpect(status().isCreated());
 
+        mockMvc.perform(RestDocumentationRequestBuilders
+                .get("/party?id=1")
+        ).andDo(print()).andExpect(status().isOk());
 
         mockMvc.perform(RestDocumentationRequestBuilders
                 .get("/party?master=nickname&title=title&id=1")

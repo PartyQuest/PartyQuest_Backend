@@ -1,6 +1,5 @@
 package com.partyquest.backend.domain.spec.dsl;
 
-import com.partyquest.backend.domain.dto.PartyDto;
 import com.partyquest.backend.domain.dto.RepositoryDto;
 import com.partyquest.backend.domain.entity.Party;
 import com.partyquest.backend.domain.type.PartyMemberType;
@@ -9,9 +8,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -67,6 +64,33 @@ public class PartyRepositoryCustomImpl implements PartyRepositoryCustom {
                         party.isDelete.eq(false),partyIdEq(id)
                 )
                 .fetch();
+    }
+
+    @Override
+    public RepositoryDto.ReadPartyVO getPartiesTmp(Long id) {
+        return jpaQueryFactory
+                .select(
+                        Projections.constructor(
+                                RepositoryDto.ReadPartyVO.class,
+                                file.filePath,
+                                party.description,party.title,party.id,
+                                user.nickname,
+                                Expressions.as(
+                                        JPAExpressions
+                                                .select(userParty.count())
+                                                .from(userParty)
+                                                .where(userParty.party.eq(party)),"CNT"
+                                )
+                        )
+                ).from(party)
+                .join(party.userParties,userParty)
+                .join(userParty.user, user)
+                .join(party.files, file)
+                .where(
+                        party.isPublic.eq(true),
+                        party.isDelete.eq(false),
+                        partyIdEq(id)
+                ).fetchOne();
     }
 
     @Override

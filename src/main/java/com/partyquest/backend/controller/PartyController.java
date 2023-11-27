@@ -40,8 +40,10 @@ public class PartyController {
                                                  @RequestParam(value = "id",required = false) Long pId,
                                                  @RequestParam(value = "title",required = false) String title)
     {
-        List<PartyDto.ReadPartyDto.Response> responses = partyService.readPartyDto(master, title, pId);
-        return ResponseEntityFactory.okResponse(responses);
+        if(master == null && title == null && pId != null) {
+            return ResponseEntityFactory.okResponse(partyService.readPartySpecification(id));
+        }
+        return ResponseEntityFactory.okResponse(partyService.readPartyDto(master, title, pId));
     }
 
     @PostMapping("/application")

@@ -16,4 +16,6 @@ public interface PartyService {
     List<ReadApplicatorDto.Response> getMemberFromGrade(Long partyId, PartyMemberType grade);
     List<MembershipPartyDto.Response> getMembershipParties(long userId);
 
+    ReadPartyDto.Response readPartySpecification(Long id);
+
 }

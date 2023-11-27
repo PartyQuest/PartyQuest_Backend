@@ -91,6 +91,9 @@ class PartyRepositoryCustomImplTest {
         for(RepositoryDto.ReadPartiesVO dto : tmp) {
             System.out.println(dto.toString());
         }
+        System.out.println();
+        RepositoryDto.ReadPartyVO vo = partyRepository.getPartiesTmp(1L);
+        System.out.println(vo.toString());
 //        List<Party> parties = partyRepository.getParties(null,null,null);
 //        System.out.println(parties.size());
 //        User user1 = parties.get(0).getUserParties().get(0).getUser();

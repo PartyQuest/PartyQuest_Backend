@@ -1,6 +1,5 @@
 package com.partyquest.backend.domain.spec.dsl;
 
-import com.partyquest.backend.domain.dto.PartyDto;
 import com.partyquest.backend.domain.dto.RepositoryDto;
 import com.partyquest.backend.domain.entity.Party;
 
@@ -14,4 +13,5 @@ public interface PartyRepositoryCustom {
     List<RepositoryDto.ReadPartiesVO> getPartiesTmp(String master, String title, Long id);
     Optional<Party> getParty(long id);
     String findMasterNameByParty(Party searchParty);
+    RepositoryDto.ReadPartyVO getPartiesTmp(Long id);
 }
