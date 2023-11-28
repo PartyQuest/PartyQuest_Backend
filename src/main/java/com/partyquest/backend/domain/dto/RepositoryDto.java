@@ -14,6 +14,7 @@ public class RepositoryDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UserApplicatorRepositoryDto {
+        private String filePath;
         private boolean registered;
         private String nickname;
         private long id;

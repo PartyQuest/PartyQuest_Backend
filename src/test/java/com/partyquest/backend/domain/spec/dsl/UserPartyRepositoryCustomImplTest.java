@@ -84,18 +84,9 @@ public class UserPartyRepositoryCustomImplTest {
         System.out.println(user.getId());
 
         List<RepositoryDto.UserApplicatorRepositoryDto> members = userPartyRepository.findMemberFromGrade(party, PartyMemberType.MASTER);
-        System.out.println(members.toString());
-        List<Long> memberIds = new ArrayList<>();
         for(RepositoryDto.UserApplicatorRepositoryDto member : members) {
-            memberIds.add(member.getId());
+            System.out.println(member.toString());
         }
-        Map<Long, String> map = fileRepository.getUserImagePath(memberIds);
-
-        for(RepositoryDto.UserApplicatorRepositoryDto member : members) {
-            String path = map.get(member.getId());
-            System.out.println(path);
-        }
-        System.out.println(map.toString());
     }
 
     @Test

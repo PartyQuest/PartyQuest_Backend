@@ -46,20 +46,48 @@ public class UserPartyRepositoryCustomImpl implements UserPartyRepositoryCustom{
     }
 
     @Override
-    public List<RepositoryDto.UserApplicatorRepositoryDto> findMemberFromGrade(Party party,PartyMemberType grade) {
-        return jpaQueryFactory
-                .select(
-                        Projections.fields(RepositoryDto.UserApplicatorRepositoryDto.class,
-                                userParty.registered,
-                                userParty.user.nickname,
-                                userParty.user.id)
-                )
-                .from(userParty).innerJoin(userParty.user)
-                .where(
-                        userParty.memberGrade.eq(grade),
-                        userParty.party.eq(party)
-                        )
-                .fetch();
+    public List<RepositoryDto.UserApplicatorRepositoryDto> findMemberFromGrade(Party inputParty,PartyMemberType grade) {
+        if(grade == null) {
+            return jpaQueryFactory
+                    .select(
+                            Projections.constructor(
+                                    RepositoryDto.UserApplicatorRepositoryDto.class,
+                                    file.filePath,
+                                    userParty.registered,
+                                    user.nickname,
+                                    user.id
+                            )
+                    )
+                    .from(userParty)
+                    .join(userParty.user, user)
+                    .join(userParty.party,party)
+                    .join(user.files, file)
+                    .where(
+                            user.isDelete.eq(false),
+                            party.eq(inputParty)
+
+                    ).fetch();
+        } else {
+            return jpaQueryFactory
+                    .select(
+                            Projections.constructor(
+                                    RepositoryDto.UserApplicatorRepositoryDto.class,
+                                    file.filePath,
+                                    userParty.registered,
+                                    user.nickname,
+                                    user.id
+                            )
+                    )
+                    .from(userParty)
+                    .join(userParty.user, user)
+                    .join(userParty.party,party)
+                    .join(user.files, file)
+                    .where(
+                            user.isDelete.eq(false),
+                            party.eq(inputParty),
+                            userParty.memberGrade.eq(grade)
+                    ).fetch();
+        }
     }
 
     @Override

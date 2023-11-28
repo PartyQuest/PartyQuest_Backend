@@ -180,21 +180,30 @@ public class PartyServiceImpl implements PartyService {
         Party party = optParty.get();
 
         List<RepositoryDto.UserApplicatorRepositoryDto> members = userPartyRepository.findMemberFromGrade(party, grade);
-        log.info(members.toString());
-        List<Long> memberIds = new ArrayList<>();
+        List<ReadApplicatorDto.Response> result = new ArrayList<ReadApplicatorDto.Response>();
         for(RepositoryDto.UserApplicatorRepositoryDto member : members) {
-            memberIds.add(member.getId());
+            result.add(
+                    ReadApplicatorDto.Response.builder()
+                            .nickname(member.getNickname())
+                            .registered(member.isRegistered())
+                            .userThumbnailPath(member.getFilePath())
+                            .build()
+            );
         }
-
-        Map<Long, String> userImagePath = fileRepository.getUserImagePath(memberIds);
-        log.info(userImagePath.toString());
-        List<ReadApplicatorDto.Response> result = new ArrayList<>();
-        for(RepositoryDto.UserApplicatorRepositoryDto member : members) {
-            result.add(ReadApplicatorDto.Response.builder()
-                    .nickname(member.getNickname())
-                    .registered(member.isRegistered())
-                    .userThumbnailPath(userImagePath.get(member.getId())).build());
-        }
+//        List<Long> memberIds = new ArrayList<>();
+//        for(RepositoryDto.UserApplicatorRepositoryDto member : members) {
+//            memberIds.add(member.getId());
+//        }
+//
+//        Map<Long, String> userImagePath = fileRepository.getUserImagePath(memberIds);
+//        log.info(userImagePath.toString());
+//        List<ReadApplicatorDto.Response> result = new ArrayList<>();
+//        for(RepositoryDto.UserApplicatorRepositoryDto member : members) {
+//            result.add(ReadApplicatorDto.Response.builder()
+//                    .nickname(member.getNickname())
+//                    .registered(member.isRegistered())
+//                    .userThumbnailPath(userImagePath.get(member.getId())).build());
+//        }
         return result;
     }
 
