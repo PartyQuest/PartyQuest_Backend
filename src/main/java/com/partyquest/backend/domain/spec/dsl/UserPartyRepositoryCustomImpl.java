@@ -96,7 +96,11 @@ public class UserPartyRepositoryCustomImpl implements UserPartyRepositoryCustom{
                 .select(
                         Projections.constructor(
                                 RepositoryDto.MembershipDto.class,
-                                file.filePath,party.title,user.nickname,
+                                party.id,
+                                file.filePath,
+                                party.title,
+                                user.nickname,
+                                userParty.memberGrade,
                                 Expressions.as(
                                         JPAExpressions
                                                 .select(userParty.count())

@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.partyquest.backend.domain.dto.PartyDto.*;
 
@@ -112,9 +111,9 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public ApplicationPartyDto.Response ApplicationParty(ApplicationPartyDto.Request requestDto) {
-        Optional<User> optUser = userRepository.findById(requestDto.getUserId());
-        Optional<Party> optParty = partyRepository.getParty(requestDto.getPartId());
+    public ApplicationPartyDto.Response ApplicationParty(ApplicationPartyDto.Request requestDto, long userID) {
+        Optional<User> optUser = userRepository.findById(userID);
+        Optional<Party> optParty = partyRepository.getParty(requestDto.getPartyId());
         if(optUser.isEmpty()) throw new EmailNotFoundException("NOT FOUND USER",ErrorCode.EMAIL_NOT_FOUND);
         if(optParty.isEmpty()) throw new PartyNotFoundException("NOT FOUND PARTY",ErrorCode.PARTY_NOT_FOUND);
 
@@ -174,7 +173,7 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public List<ReadApplicatorDto.Response> getMemberFromGrade(Long partyId, PartyMemberType grade) {
+    public HashMap<String, Object> getMemberFromGrade(Long partyId, PartyMemberType grade) {
         Optional<Party> optParty = partyRepository.findById(partyId);
         if(optParty.isEmpty()) throw new PartyNotFoundException("NOT FOUND PARTY",ErrorCode.PARTY_NOT_FOUND);
         Party party = optParty.get();
@@ -190,21 +189,10 @@ public class PartyServiceImpl implements PartyService {
                             .build()
             );
         }
-//        List<Long> memberIds = new ArrayList<>();
-//        for(RepositoryDto.UserApplicatorRepositoryDto member : members) {
-//            memberIds.add(member.getId());
-//        }
-//
-//        Map<Long, String> userImagePath = fileRepository.getUserImagePath(memberIds);
-//        log.info(userImagePath.toString());
-//        List<ReadApplicatorDto.Response> result = new ArrayList<>();
-//        for(RepositoryDto.UserApplicatorRepositoryDto member : members) {
-//            result.add(ReadApplicatorDto.Response.builder()
-//                    .nickname(member.getNickname())
-//                    .registered(member.isRegistered())
-//                    .userThumbnailPath(userImagePath.get(member.getId())).build());
-//        }
-        return result;
+        HashMap<String, Object> response = new HashMap<>();
+        response.put("data",result);
+        response.put("partyID",partyId);
+        return response;
     }
 
     @Override
@@ -216,6 +204,8 @@ public class PartyServiceImpl implements PartyService {
         List<MembershipPartyDto.Response> result = new ArrayList<>();
         for(RepositoryDto.MembershipDto dto : membershipDtoList) {
             result.add(MembershipPartyDto.Response.builder()
+                            .partyID(dto.getId())
+                            .memberGrade(dto.getGrade().toString())
                     .partyMaster(dto.getPartyMaster())
                     .partyMemberCnt(dto.getPartyMemberCnt())
                     .partyThumbnailPath(dto.getPartyThumbnailPath())
@@ -236,5 +226,13 @@ public class PartyServiceImpl implements PartyService {
                 .id(vo.getPartyId())
                 .title(vo.getPartyTitle())
                 .build();
+    }
+
+    @Override
+    public void AcceptPartyApplicator(List<Long> userID) {
+        for(long id : userID) {
+            if(userRepository.findById(id).isEmpty()) throw new EmailNotFoundException("NOT FOUND USER",ErrorCode.EMAIL_NOT_FOUND);
+
+        }
     }
 }

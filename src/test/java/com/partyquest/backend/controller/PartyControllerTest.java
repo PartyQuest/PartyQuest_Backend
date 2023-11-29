@@ -162,8 +162,7 @@ class PartyControllerTest {
 
         PartyDto.ApplicationPartyDto.Request request = ApplicationPartyDto.Request.builder()
                 .partyName("title")
-                .partId(1L)
-                .userId(save.getId())
+                .partyId(1L)
                 .build();
 
         mockMvc.perform(RestDocumentationRequestBuilders
@@ -178,8 +177,7 @@ class PartyControllerTest {
                         preprocessResponse(prettyPrint()),
                         requestFields(
                                 fieldWithPath("partyName").type(JsonFieldType.STRING).description("Party Name"),
-                                fieldWithPath("partId").type(JsonFieldType.NUMBER).description("Party ID"),
-                                fieldWithPath("userId").type(JsonFieldType.NUMBER).description("User ID")
+                                fieldWithPath("partyId").type(JsonFieldType.NUMBER).description("Party ID")
                         )
                 )
                 )
@@ -205,8 +203,7 @@ class PartyControllerTest {
         User save = userRepository.save(user);
         PartyDto.ApplicationPartyDto.Request request = ApplicationPartyDto.Request.builder()
                 .partyName("title")
-                .partId(1L)
-                .userId(save.getId())
+                .partyId(1L)
                 .build();
 
         mockMvc.perform(RestDocumentationRequestBuilders

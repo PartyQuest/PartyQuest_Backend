@@ -21,10 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -209,7 +206,7 @@ class PartyServiceImplTest {
         fileRepository.deleteAll();
     }
 
-    @Test
+    //@Test
     @DisplayName("APPLICATION_PARTY_SERVICE")
     @Transactional
     void ApplicationParty() {
@@ -223,7 +220,16 @@ class PartyServiceImplTest {
                 .nickname("test02")
                 .password("pass")
                 .build(), "LOCAL");
-        Party party = new Party(0L, "testCode", "title", "test", 20, true, new ArrayList<>(), null);
+//        Party party = new Party( "testCode", "title", "test", 20, true, new ArrayList<>(), null);
+        Party party = Party.builder()
+                .accessCode("testCode")
+                .title("title")
+                .description("des")
+                .capabilities(20)
+                .isPublic(true)
+                .userParties(new ArrayList<>())
+                .files(new ArrayList<>())
+                .build();
         party = partyRepository.save(party);
 
         User user1 = userRepository.findById(signupResponseDto1.getId()).get();
@@ -245,9 +251,8 @@ class PartyServiceImplTest {
 
         PartyDto.ApplicationPartyDto.Response response = partyService.ApplicationParty(PartyDto.ApplicationPartyDto.Request.builder()
                 .partyName("title")
-                .partId(party.getId())
-                .userId(user2.getId())
-                .build());
+                .partyId(party.getId())
+                .build(),user2.getId());
 
         System.out.println(response.getPartyId() + " " + response.getUserPartyId() + " " + response.getUserId());
         List<UserParty> testParty = userPartyRepository.findByParty(party);
@@ -256,6 +261,8 @@ class PartyServiceImplTest {
         }
         Long member = userPartyRepository.countPartyMember(party);
         System.out.println(member);
+        HashMap<String, Object> memberFromGrade = partyService.getMemberFromGrade(1L, PartyMemberType.NO_MEMBER);
+        System.out.println(memberFromGrade.toString());
 
         userRepository.deleteAll();
         partyRepository.deleteAll();

@@ -1,6 +1,7 @@
 package com.partyquest.backend.domain.dto;
 
 
+import com.partyquest.backend.domain.type.PartyMemberType;
 import lombok.*;
 
 @Data
@@ -34,9 +35,11 @@ public class RepositoryDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MembershipDto {
+        private Long id;
         private String partyThumbnailPath;
         private String partyTitle;
         private String partyMaster;
+        private PartyMemberType grade;
         private long partyMemberCnt;
     }
 

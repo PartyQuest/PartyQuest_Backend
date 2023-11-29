@@ -115,8 +115,7 @@ public class PartyDto {
         @AllArgsConstructor
         public static class Request {
             private String partyName;
-            private Long partId;
-            private Long userId;
+            private long partyId;
         }
 
         @Data
@@ -152,9 +151,11 @@ public class PartyDto {
         @NoArgsConstructor
         @AllArgsConstructor
         public static class Response {
+            private Long partyID;
             private String partyThumbnailPath;
             private String partyTitle;
             private String partyMaster;
+            private String memberGrade;
             private long partyMemberCnt;
         }
     }

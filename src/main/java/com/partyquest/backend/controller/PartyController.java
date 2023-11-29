@@ -41,7 +41,7 @@ public class PartyController {
                                                  @RequestParam(value = "title",required = false) String title)
     {
         if(master == null && title == null && pId != null) {
-            return ResponseEntityFactory.okResponse(partyService.readPartySpecification(id));
+            return ResponseEntityFactory.okResponse(partyService.readPartySpecification(pId));
         }
         return ResponseEntityFactory.okResponse(partyService.readPartyDto(master, title, pId));
     }
@@ -50,7 +50,8 @@ public class PartyController {
     public ResponseEntity<?> ApplicationPartyController(@AuthenticationPrincipal long id,
                                                         @RequestBody PartyDto.ApplicationPartyDto.Request dto)
     {
-        PartyDto.ApplicationPartyDto.Response response = partyService.ApplicationParty(dto);
+        log.info(dto.toString());
+        PartyDto.ApplicationPartyDto.Response response = partyService.ApplicationParty(dto,id);
         return ResponseEntityFactory.okResponse(response);
     }
 
@@ -62,13 +63,19 @@ public class PartyController {
                 @RequestParam(value = "partyID") Long partyID
             )
     {
-        List<PartyDto.ReadApplicatorDto.Response> responses = partyService.getMemberFromGrade(partyID, JsonEnumTypeConfig.fromString(PartyMemberType.class, grade));
-        return ResponseEntityFactory.okResponse(responses);
+        return ResponseEntityFactory.okResponse(partyService.getMemberFromGrade(partyID, JsonEnumTypeConfig.fromString(PartyMemberType.class, grade)));
     }
 
     @GetMapping("/my-parties")
     public ResponseEntity<?> FindMyPartiesController(@AuthenticationPrincipal long id) {
         List<PartyDto.MembershipPartyDto.Response> parties = partyService.getMembershipParties(id);
         return ResponseEntityFactory.okResponse(parties);
+    }
+
+    @PostMapping("/application/accept")
+    public ResponseEntity<?> AcceptPartyApplicator(@AuthenticationPrincipal long id,
+                                                   @RequestBody List<Long> userID)
+    {
+        return null;
     }
 }
