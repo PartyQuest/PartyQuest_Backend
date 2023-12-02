@@ -96,15 +96,10 @@ public class PartyRepositoryCustomImpl implements PartyRepositoryCustom {
     @Override
     public List<RepositoryDto.ReadPartiesVO> getPartiesTmp(String master, String title, Long id) {
         return jpaQueryFactory
-                .select(
+                .selectDistinct(
                         Projections.constructor(RepositoryDto.ReadPartiesVO.class,
                                 file.filePath,party.title,party.id,user.nickname,
-                                Expressions.as(
-                                        JPAExpressions
-                                                .select(userParty.count())
-                                                .from(userParty)
-                                                .where(userParty.party.eq(party)),"CNT"
-                                )
+                                JPAExpressions.select(userParty.count()).from(userParty).where(userParty.party.eq(party))
                                 )
                 )
                 .from(party)

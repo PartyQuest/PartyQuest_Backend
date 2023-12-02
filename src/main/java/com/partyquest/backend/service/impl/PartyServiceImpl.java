@@ -1,9 +1,6 @@
 package com.partyquest.backend.service.impl;
 
-import com.partyquest.backend.config.exception.EmailNotFoundException;
-import com.partyquest.backend.config.exception.ErrorCode;
-import com.partyquest.backend.config.exception.PartyApplicationDuplicateException;
-import com.partyquest.backend.config.exception.PartyNotFoundException;
+import com.partyquest.backend.config.exception.*;
 import com.partyquest.backend.domain.dto.PartyDto;
 import com.partyquest.backend.domain.dto.RepositoryDto;
 import com.partyquest.backend.domain.entity.File;
@@ -23,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.partyquest.backend.domain.dto.PartyDto.*;
 
@@ -173,26 +171,20 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public HashMap<String, Object> getMemberFromGrade(Long partyId, PartyMemberType grade) {
-        Optional<Party> optParty = partyRepository.findById(partyId);
-        if(optParty.isEmpty()) throw new PartyNotFoundException("NOT FOUND PARTY",ErrorCode.PARTY_NOT_FOUND);
-        Party party = optParty.get();
+    public List<ReadPartyMemberDto.Response> getMemberFromGrade(Long partyId, PartyMemberType grade) {
+        if(partyRepository.findById(partyId).isEmpty()) throw new PartyNotFoundException("NOT FOUND PARTY",ErrorCode.PARTY_NOT_FOUND);
 
-        List<RepositoryDto.UserApplicatorRepositoryDto> members = userPartyRepository.findMemberFromGrade(party, grade);
-        List<ReadApplicatorDto.Response> result = new ArrayList<ReadApplicatorDto.Response>();
-        for(RepositoryDto.UserApplicatorRepositoryDto member : members) {
-            result.add(
-                    ReadApplicatorDto.Response.builder()
-                            .nickname(member.getNickname())
-                            .registered(member.isRegistered())
-                            .userThumbnailPath(member.getFilePath())
-                            .build()
-            );
-        }
-        HashMap<String, Object> response = new HashMap<>();
-        response.put("data",result);
-        response.put("partyID",partyId);
-        return response;
+        List<RepositoryDto.PartyMemberVO> memberFromGrade = userPartyRepository.findMemberFromGrade(partyId, grade);
+        return memberFromGrade.stream()
+                .map(member -> ReadPartyMemberDto.Response.builder()
+                        .grade(member.getGrade())
+                        .partyID(partyId)
+                        .filePath(member.getFilePath())
+                        .nickname(member.getNickname())
+                        .registered(member.isRegistered())
+                        .userID(member.getUserID())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -229,10 +221,20 @@ public class PartyServiceImpl implements PartyService {
     }
 
     @Override
-    public void AcceptPartyApplicator(List<Long> userID) {
-        for(long id : userID) {
-            if(userRepository.findById(id).isEmpty()) throw new EmailNotFoundException("NOT FOUND USER",ErrorCode.EMAIL_NOT_FOUND);
+    public void AcceptPartyApplicator(ApplicationPartyDto.AcceptRequest dto, long masterID) {
+        //입력 값 - 유저 데이터 검증
+        if(!userRepository.isUser(dto.getUserID()))
+            throw new EmailNotFoundException("NOT FOUND USER",ErrorCode.EMAIL_NOT_FOUND);
 
-        }
+        //유저 데이터가 정확히 해당 파티를 신청했는지 검증 -> userParty 테이블에서 dto.getPartyID로 파티 일치하는지 조회
+        if(!userPartyRepository.isApplicationUser(dto.getUserID(),dto.getPartyID()))
+            throw new NotPartyMemberException("NOT PARTY MEMBER",ErrorCode.NOT_PARTY_MEMBER);
+
+        //파티 마스터가 정확히 권한을 가지고 있는 유저인가?
+        if(!userPartyRepository.isMasterAndAdminUserTmp(masterID, dto.getPartyID()))
+            throw new NotAdminException("NOT ADMIN USER",ErrorCode.ACCESS_DENIED);
+
+
+        userPartyRepository.updateAcceptApplicator(dto.getUserID());
     }
 }

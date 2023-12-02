@@ -83,10 +83,10 @@ public class UserPartyRepositoryCustomImplTest {
 
         System.out.println(user.getId());
 
-        List<RepositoryDto.UserApplicatorRepositoryDto> members = userPartyRepository.findMemberFromGrade(party, PartyMemberType.MASTER);
-        for(RepositoryDto.UserApplicatorRepositoryDto member : members) {
-            System.out.println(member.toString());
-        }
+//        List<RepositoryDto.UserApplicatorRepositoryDto> members = userPartyRepository.findMemberFromGrade(party, PartyMemberType.MASTER);
+//        for(RepositoryDto.UserApplicatorRepositoryDto member : members) {
+//            System.out.println(member.toString());
+//        }
     }
 
     @Test

@@ -2,14 +2,11 @@ package com.partyquest.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.partyquest.backend.config.WithAccount;
-import com.partyquest.backend.domain.dto.PartyDto;
-import com.partyquest.backend.domain.entity.User;
 import com.partyquest.backend.domain.repository.FileRepository;
 import com.partyquest.backend.domain.repository.PartyRepository;
 import com.partyquest.backend.domain.repository.UserPartyRepository;
 import com.partyquest.backend.domain.repository.UserRepository;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -17,17 +14,23 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import java.util.*;
 
 import static com.partyquest.backend.domain.dto.PartyDto.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc(addFilters = false)
@@ -35,10 +38,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class PartyControllerTest {
     @Autowired
     MockMvc mockMvc;
-
     @Autowired
     ObjectMapper objectMapper;
-
     @Autowired
     PartyRepository partyRepository;
     @Autowired
@@ -48,181 +49,406 @@ class PartyControllerTest {
     @Autowired
     FileRepository fileRepository;
 
-    @Test
-    @DisplayName("CREATE_PARTY")
-    @WithAccount("email")
-    void create_party() throws Exception {
-        CreatePartyDto.Request clientRequest = CreatePartyDto.Request.builder()
-                .title("title")
+    CreatePartyDto.Request makeParty(String title, String description) {
+        return CreatePartyDto.Request.builder()
+                .title(title)
+                .description(description)
                 .isPublic(true)
-                .description("description")
                 .build();
-
-        mockMvc.perform(RestDocumentationRequestBuilders
-                .post("/party")
-                .contentType("application/json")
-                .accept("application/json")
-                .content(objectMapper.writeValueAsString(clientRequest))
-        ).andDo(
-                document(
-                        "create_party",
-                        preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint()),
-                        requestFields(
-                                fieldWithPath("title").type(JsonFieldType.STRING).description("Party title"),
-                                fieldWithPath("isPublic").type(JsonFieldType.BOOLEAN).description("Party view Public/Private"),
-                                fieldWithPath("description").type(JsonFieldType.STRING).description("Party description")
-                        )
-                )
-        ).andDo(print()).andExpect(status().isCreated());
-
-        partyRepository.deleteAll();
-        userPartyRepository.deleteAll();
-        fileRepository.deleteAll();
-        userRepository.deleteAll();
     }
 
-    @Test
-    @DisplayName("READ_PARTY_LIST")
-    @WithAccount("email")
-    void read_party_list() throws Exception {
+    @Nested
+    @DisplayName("파티를_생성한다")
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+    class CreatePartyTestClass {
+        @Test
+        @Order(1)
+        @DisplayName("메인테스트01=파티_생성")
+        @WithAccount("create_tester01")
+        void createParty() throws Exception {
+            mockMvc.perform(RestDocumentationRequestBuilders
+                    .post("/party")
+                    .contentType("application/json")
+                    .accept("application/json")
+                    .content(objectMapper.writeValueAsString(
+                            makeParty("create party test title",
+                                    "create party test description")))
+            ).andDo(
+                    document(
+                            "create_party",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            requestFields(
+                                    fieldWithPath("title").type(JsonFieldType.STRING).description("Party title"),
+                                    fieldWithPath("isPublic").type(JsonFieldType.BOOLEAN).description("Party view Public/Private"),
+                                    fieldWithPath("description").type(JsonFieldType.STRING).description("Party description")
+                            )
+                    )
+            ).andExpect(status().isCreated());
+        }
 
-        CreatePartyDto.Request clientRequest = CreatePartyDto.Request.builder()
-                .title("title")
-                .isPublic(true)
-                .description("description")
-                .build();
-
-        mockMvc.perform(RestDocumentationRequestBuilders
-                .post("/party")
-                .contentType("application/json")
-                .accept("application/json")
-                .content(objectMapper.writeValueAsString(clientRequest))
-        ).andDo(
-                document(
-                        "create_party",
-                        preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint())
-                )
-        ).andDo(print()).andExpect(status().isCreated());
-
-//        mockMvc.perform(RestDocumentationRequestBuilders
-//                .get("/party?id=1")
-//        ).andDo(print()).andExpect(status().isOk());
-
-        mockMvc.perform(RestDocumentationRequestBuilders
-                .get("/party?master=nickname&title=title&id=1")
-        ).andDo(
-                document(
-                        "read_party_list",
-                        preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint()),
-                        queryParameters(
-                                parameterWithName("master").description("Party master name"),
-                                parameterWithName("title").description("Party title"),
-                                parameterWithName("id").description("Party id")
-                        )
-                )
-        ).andDo(print()).andExpect(status().isOk());
-
-        partyRepository.deleteAll();
-        userPartyRepository.deleteAll();
-        fileRepository.deleteAll();
-        userRepository.deleteAll();
+        @Test
+        @Order(999)
+        @DisplayName("데이터베이스 초기화")
+        void init() {
+            fileRepository.deleteAll();
+            userPartyRepository.deleteAll();
+            partyRepository.deleteAll();
+            userRepository.deleteAll();
+        }
     }
+    @Nested
+    @DisplayName("파티_목록을_조회한다")
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+    class ReadPartyTestClass {
+        @Test
+        @Order(1)
+        @DisplayName("사전작업01=파티_5회_생성")
+        @WithAccount("preprocess_make_party_tester01")
+        void preprocess_party() throws Exception {
+            for(int i = 1; i <= 5; i++) {
+                CreatePartyDto.Request request = makeParty("preprocess_party_title"+i,
+                        "preprocess_party_description");
+                mockMvc.perform(
+                        post("/party")
+                                .contentType("application/json")
+                                .accept("application/json")
+                                .content(objectMapper.writeValueAsString(request))
+                ).andReturn();
+            }
+        }
 
-    @WithAccount("email1")
-    void createParty() throws Exception {
-        CreatePartyDto.Request clientRequest = CreatePartyDto.Request.builder()
-                .title("title")
-                .isPublic(true)
-                .description("description")
-                .build();
+        @Test
+        @Order(2)
+        @DisplayName("메인테스트01=조건_없이_전부_탐색")
+        @WithAccount("read_success_tester01")
+        void read_success_test() throws Exception {
+            MvcResult result = mockMvc.perform(
+                    get("/party")
+            ).andExpect(status().isOk()).andReturn();
 
-        mockMvc.perform(RestDocumentationRequestBuilders
-                .post("/party")
-                .contentType("application/json")
-                .accept("application/json")
-                .content(objectMapper.writeValueAsString(clientRequest))
-        ).andDo(print()).andExpect(status().isCreated());
+            HashMap<String,Object> map = objectMapper.readValue(result.getResponse().getContentAsString(), HashMap.class);
+            List<List<HashMap<String,Object>>> inner = (List<List<HashMap<String, Object>>>) map.get("data");
+
+            assertAll(
+                    () -> assertEquals(inner.get(0).size(), 5)
+            );
+        }
+
+        @Test
+        @Order(2)
+        @DisplayName("메인테스트02=일부_조건_탐색")
+        @WithAccount("read_success_tester02")
+        void read_success_condition_test() throws Exception{
+            MvcResult result = mockMvc.perform(
+                    get("/party").param("title", "preprocess_party_title1")
+            ).andExpect(status().isOk()).andReturn();
+
+            HashMap<String,Object> map = objectMapper.readValue(result.getResponse().getContentAsString(), HashMap.class);
+            List<List<HashMap<String,Object>>> inner = (List<List<HashMap<String, Object>>>) map.get("data");
+
+            assertAll(
+                    ()->assertEquals(inner.get(0).size(),1)
+            );
+        }
+
+        @Test
+        @Order(2)
+        @DisplayName("메인테스트03=모든_조건_탐색")
+        @WithAccount("read_success_tester03")
+        void read_success_all_condition_test() throws Exception {
+            MvcResult result = mockMvc.perform(get("/party")
+                    .param("master", "preprocess_make_party_tester01")
+                    .param("title", "preprocess_party_title1")
+            ).andDo(
+                    document(
+                            "read_party_list",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            queryParameters(
+                                    parameterWithName("master").description("Party master name"),
+                                    parameterWithName("title").description("Party title")
+                            )
+                    )
+            ).andDo(print()).andExpect(status().isOk()).andReturn();
+
+            HashMap<String,Object> map = objectMapper.readValue(result.getResponse().getContentAsString(), HashMap.class);
+            List<List<HashMap<String,Object>>> inner = (List<List<HashMap<String, Object>>>) map.get("data");
+
+            assertAll(
+                    ()->assertEquals(inner.get(0).size(),1)
+            );
+        }
+        @Test
+        @Order(999)
+        @DisplayName("데이터베이스 초기화")
+        void init() {
+            fileRepository.deleteAll();
+            userPartyRepository.deleteAll();
+            partyRepository.deleteAll();
+            userRepository.deleteAll();
+        }
     }
+    @Nested
+    @DisplayName("파티_가입을_신청한다")
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+    class ApplicationPartyTestClass {
+        public static int partyID;
+        @Test
+        @Order(1)
+        @DisplayName("사전작업01=파티_생성")
+        @WithAccount("preprocess_make_party_application_tester01")
+        void preprocess_party() throws Exception {
+            CreatePartyDto.Request request = makeParty("preprocess_party_title",
+                    "preprocess_party_description");
+            MvcResult result = mockMvc.perform(
+                    post("/party")
+                            .contentType("application/json")
+                            .accept("application/json")
+                            .content(objectMapper.writeValueAsString(request))
+            ).andReturn();
+            List<HashMap<String,Object>> td = (List<HashMap<String, Object>>) objectMapper.readValue(result.getResponse().getContentAsString(),HashMap.class).get("data");
+            partyID = (int) td.get(0).get("id");
+        }
 
-    @Test
-    @DisplayName("APPLICATION_PARTY")
-    @WithAccount("email2")
-    void applicationParty() throws Exception {
-        createParty();
-        User user = User.builder()
-                .deviceTokens(null)
-                .password("password")
-                .email("email")
-                .nickname("nickname")
-                .build();
-        User save = userRepository.save(user);
+        @Test
+        @Order(2)
+        @DisplayName("메인테스트01=파티_신청")
+        @WithAccount("application_success_tester01")
+        void application_success_test() throws Exception {
+            ApplicationPartyDto.Request request = ApplicationPartyDto.Request.builder()
+                    .partyId(partyID)
+                    .partyName("preprocess_party_title")
+                    .build();
 
-        PartyDto.ApplicationPartyDto.Request request = ApplicationPartyDto.Request.builder()
-                .partyName("title")
-                .partyId(1L)
-                .build();
+            MvcResult result = mockMvc.perform(RestDocumentationRequestBuilders
+                    .post("/party/application")
+                    .contentType("application/json")
+                    .accept("application/json")
+                    .content(objectMapper.writeValueAsString(request))
+            ).andDo(
+                    document(
+                            "party_application",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            requestFields(
+                                    fieldWithPath("partyId").type(JsonFieldType.NUMBER).description("application party ID"),
+                                    fieldWithPath("partyName").type(JsonFieldType.STRING).description("application party title")
+                            )
+                    )
+                    )
+                    .andExpect(status().isOk()).andReturn();
 
-        mockMvc.perform(RestDocumentationRequestBuilders
-                .post("/party/application")
-                .contentType("application/json")
-                .accept("application/json")
-                .content(objectMapper.writeValueAsString(request))
-        ).andDo(
-                document(
-                        "application_party",
-                        preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint()),
-                        requestFields(
-                                fieldWithPath("partyName").type(JsonFieldType.STRING).description("Party Name"),
-                                fieldWithPath("partyId").type(JsonFieldType.NUMBER).description("Party ID")
-                        )
-                )
-                )
-                .andDo(print());
+            List<HashMap<String,Object>> data =
+                    (List<HashMap<String, Object>>) objectMapper.readValue(result.getResponse().getContentAsString(),HashMap.class).get("data");
 
-        partyRepository.deleteAll();
-        userPartyRepository.deleteAll();
-        fileRepository.deleteAll();
-        userRepository.deleteAll();
+            assertAll(
+                    () -> assertEquals(data.get(0).size(), 3)
+            );
+        }
+
+        @Test
+        @Order(2)
+        @DisplayName("실패테스트02=파티_신청_파티찾기_불가")
+        @WithAccount("application_failed_tester01")
+        void application_failed_test() throws Exception{
+            ApplicationPartyDto.Request request = ApplicationPartyDto.Request.builder()
+                    .partyId(9999)
+                    .partyName("preprocess_party_title")
+                    .build();
+
+            MvcResult result = mockMvc.perform(RestDocumentationRequestBuilders
+                    .post("/party/application")
+                    .contentType("application/json")
+                    .accept("application/json")
+                    .content(objectMapper.writeValueAsString(request))
+            ).andExpect(status().isBadRequest()).andReturn();
+
+        }
+
+        @Test
+        @Order(999)
+        @DisplayName("데이터베이스 초기화")
+        void init() {
+            fileRepository.deleteAll();
+            userPartyRepository.deleteAll();
+            partyRepository.deleteAll();
+            userRepository.deleteAll();
+        }
     }
+    @Nested
+    @DisplayName("파티_멤버를_등급별로_조회한다")
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+    class MemberGradeTestClass {
+        public static int partyID;
+        @Test
+        @Order(1)
+        @DisplayName("사전작업01=파티_생성")
+        @WithAccount("preprocessing_make_party_search_grade_tester01")
+        void preprocessing_make_party_search_grade_test() throws Exception{
+            CreatePartyDto.Request request = makeParty("preprocess_party_title",
+                    "preprocess_party_description");
+            MvcResult result = mockMvc.perform(
+                    post("/party")
+                            .contentType("application/json")
+                            .accept("application/json")
+                            .content(objectMapper.writeValueAsString(request))
+            ).andReturn();
+            List<HashMap<String,Object>> td = (List<HashMap<String, Object>>) objectMapper.readValue(result.getResponse().getContentAsString(),HashMap.class).get("data");
+            partyID = (int) td.get(0).get("id");
+        }
 
-    @Test
-    @DisplayName("APPLICATIOR LIST")
-    @WithAccount("email3")
-    void applicator() throws Exception {
-        createParty();
-        User user = User.builder()
-                .deviceTokens(null)
-                .password("password")
-                .email("email4")
-                .nickname("nickname")
-                .build();
-        User save = userRepository.save(user);
-        PartyDto.ApplicationPartyDto.Request request = ApplicationPartyDto.Request.builder()
-                .partyName("title")
-                .partyId(1L)
-                .build();
+        @Test
+        @Order(2)
+        @DisplayName("사전작업02=파티_신청")
+        @WithAccount("preprocessing_application_party_tester01")
+        void preprocessing_application_party_test01() throws Exception {
+            ApplicationPartyDto.Request request = ApplicationPartyDto.Request.builder()
+                    .partyId(partyID)
+                    .partyName("preprocess_party_title")
+                    .build();
+            mockMvc.perform(
+                    post("/party/application")
+                            .contentType("application/json")
+                            .accept("application/json")
+                            .content(objectMapper.writeValueAsString(request))
+            ).andDo(print());
+        }
 
-        mockMvc.perform(RestDocumentationRequestBuilders
-                        .post("/party/application")
-                        .contentType("application/json")
-                        .accept("application/json")
-                        .content(objectMapper.writeValueAsString(request))
-                ).andDo(print());
+        @Test
+        @Order(3)
+        @DisplayName("메인테스트01=파티원_검색")
+        @WithAccount("preprocessing_make_party_search_grade_tester01")
+        void applicator_search_test() throws Exception {
+            mockMvc.perform(get("/party/member?partyID="+partyID)).andDo(print()).andExpect(status().isOk());
+        }
 
-        mockMvc.perform(RestDocumentationRequestBuilders
-                .get("/party/member?grade=NO_MEMBER&partyID=1")
-                .contentType("application/json")
-                .accept("application/json")
-        ).andDo(print());
-
-        partyRepository.deleteAll();
-        userPartyRepository.deleteAll();
-        fileRepository.deleteAll();
-        userRepository.deleteAll();
+        @Test
+        @Order(4)
+        @DisplayName("실패테스트02=파티원_검색_실패")
+        @WithAccount("preprocessing_make_party_search_grade_tester01")
+        void applicator_search_test_failed() throws Exception {
+            mockMvc.perform(get("/party/member?partyID=100")).andDo(print()).andExpect(status().isBadRequest());
+        }
+        @Test
+        @Order(999)
+        @DisplayName("데이터베이스 초기화")
+        void init() {
+            fileRepository.deleteAll();
+            userPartyRepository.deleteAll();
+            partyRepository.deleteAll();
+            userRepository.deleteAll();
+        }
     }
+    @Nested
+    @DisplayName("파티_신청자를_파티원으로_전환한다.")
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+    class AcceptMemberTestClass {
 
+        public static Long partyID;
+        public static List<Long> userID = new ArrayList<>();
+
+        @Test
+        @Order(1)
+        @DisplayName("사전작업01=파티_생성")
+        @WithAccount("preprocessing_make_party_accept_member_tester01")
+        void preprocessing_make_party_search_grade_test() throws Exception{
+            CreatePartyDto.Request request = makeParty("preprocess_party_title",
+                    "preprocess_party_description");
+            MvcResult result = mockMvc.perform(
+                    post("/party")
+                            .contentType("application/json")
+                            .accept("application/json")
+                            .content(objectMapper.writeValueAsString(request))
+            ).andReturn();
+            List<HashMap<String,Object>> td = (List<HashMap<String, Object>>) objectMapper.readValue(result.getResponse().getContentAsString(),HashMap.class).get("data");
+            partyID = (long)(int)td.get(0).get("id");
+        }
+
+        @Test
+        @Order(2)
+        @DisplayName("사전작업02=파티_신청")
+        @WithAccount("preprocessing_application_party_tester01")
+        void preprocessing_application_party_test() throws Exception {
+            ApplicationPartyDto.Request request = ApplicationPartyDto.Request.builder()
+                    .partyId(partyID)
+                    .partyName("preprocess_party_title")
+                    .build();
+            MvcResult result = mockMvc.perform(
+                    post("/party/application")
+                            .contentType("application/json")
+                            .accept("application/json")
+                            .content(objectMapper.writeValueAsString(request))
+            ).andDo(print()).andReturn();
+
+            List<HashMap<String,Object>> data = (List<HashMap<String, Object>>) objectMapper.readValue(result.getResponse().getContentAsString(), HashMap.class).get("data");
+            userID.add((long)(int)data.get(0).get("userId"));
+        }
+
+        @Test
+        @Order(3)
+        @DisplayName("메인테스트01=파티원_전환_성공")
+        @WithAccount("preprocessing_make_party_accept_member_tester01")
+        void accept_member_test01() throws Exception {
+            ApplicationPartyDto.AcceptRequest request = ApplicationPartyDto.AcceptRequest
+                    .builder()
+                    .userID(userID)
+                    .partyID(partyID)
+                    .build();
+
+            mockMvc.perform(
+                    patch("/party/application")
+                            .contentType("application/json")
+                            .accept("application/json")
+                            .content(objectMapper.writeValueAsString(request))
+            ).andDo(print());
+        }
+
+        @Test
+        @Order(3)
+        @DisplayName("실패테스트02=파티원_전환_실패_존재하지않거나_권한이_없는_파티")
+        @WithAccount("preprocessing_make_party_accept_member_tester01")
+        void accept_member_test_failed01() throws Exception {
+            ApplicationPartyDto.AcceptRequest request = ApplicationPartyDto.AcceptRequest
+                    .builder()
+                    .userID(userID)
+                    .partyID(9999L)
+                    .build();
+
+            mockMvc.perform(
+                    patch("/party/application")
+                            .contentType("application/json")
+                            .accept("application/json")
+                            .content(objectMapper.writeValueAsString(request))
+            ).andExpect(status().is4xxClientError());
+        }
+
+        @Test
+        @Order(3)
+        @DisplayName("실패테스트03=파티원_전환_실패_없는_회원")
+        @WithAccount("preprocessing_make_party_accept_member_tester01")
+        void accept_member_test_failed02() throws Exception {
+            ApplicationPartyDto.AcceptRequest request = ApplicationPartyDto.AcceptRequest
+                    .builder()
+                    .userID(List.of(1000L,1001L,1002L))
+                    .partyID(partyID)
+                    .build();
+
+            mockMvc.perform(
+                    patch("/party/application")
+                            .contentType("application/json")
+                            .accept("application/json")
+                            .content(objectMapper.writeValueAsString(request))
+            ).andExpect(status().is4xxClientError());
+        }
+        @Test
+        @Order(999)
+        @DisplayName("데이터베이스 초기화")
+        void init() {
+            fileRepository.deleteAll();
+            userPartyRepository.deleteAll();
+            partyRepository.deleteAll();
+            userRepository.deleteAll();
+        }
+    }
 }

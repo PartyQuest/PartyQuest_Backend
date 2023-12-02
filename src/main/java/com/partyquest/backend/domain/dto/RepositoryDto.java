@@ -14,11 +14,12 @@ public class RepositoryDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UserApplicatorRepositoryDto {
+    public static class PartyMemberVO {
+        private long userID;
         private String filePath;
         private boolean registered;
         private String nickname;
-        private long id;
+        private PartyMemberType grade;
     }
 
     @Data

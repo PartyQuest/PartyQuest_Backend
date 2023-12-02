@@ -2,11 +2,13 @@ package com.partyquest.backend.domain.dto;
 
 
 import com.partyquest.backend.domain.entity.Party;
+import com.partyquest.backend.domain.type.PartyMemberType;
 import lombok.*;
 
 import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 
 @Data
 @Builder
@@ -122,6 +124,15 @@ public class PartyDto {
         @Builder
         @NoArgsConstructor
         @AllArgsConstructor
+        public static class AcceptRequest {
+            private Long partyID;
+            private List<Long> userID;
+        }
+
+        @Data
+        @Builder
+        @NoArgsConstructor
+        @AllArgsConstructor
         public static class Response {
             private Long userPartyId;
             private Long userId;
@@ -131,15 +142,18 @@ public class PartyDto {
 
     @Data
     @Builder
-    public static class ReadApplicatorDto {
+    public static class ReadPartyMemberDto {
         @Data
         @Builder
         @NoArgsConstructor
         @AllArgsConstructor
         public static class Response {
-            private String userThumbnailPath;
-            private String nickname;
+            private long partyID;
+            private long userID;
+            private String filePath;
             private boolean registered;
+            private String nickname;
+            private PartyMemberType grade;
         }
     }
 

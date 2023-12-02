@@ -11,6 +11,9 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
 
+import java.util.ArrayList;
+import java.util.Optional;
+
 public class WithAccountSecurityContextFactory implements WithSecurityContextFactory<WithAccount> {
 
     @Autowired
@@ -21,7 +24,13 @@ public class WithAccountSecurityContextFactory implements WithSecurityContextFac
 
     @Override
     public SecurityContext createSecurityContext(WithAccount annotation) {
-        User user = userRepository.save(createUser(annotation.value()));
+        Optional<User> optUser = userRepository.findByEmail(annotation.value());
+        User user;
+        if(optUser.isEmpty()) {
+            user = userRepository.save(createUser(annotation.value()));
+        } else {
+            user = optUser.get();
+        }
         String[] token = tokenProvider.createToken(user).split("::");
 
         AbstractAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user.getId(),null, AuthorityUtils.NO_AUTHORITIES);
@@ -31,12 +40,14 @@ public class WithAccountSecurityContextFactory implements WithSecurityContextFac
     }
 
     private User createUser(String email) {
-        return User.builder()
-                .password("password")
-                .nickname("nickname")
-                .email(email)
-                .sns("LOCAL")
-                .userParties(null)
-                .build();
+            return User.builder()
+                    .password("password")
+                    .nickname(email)
+                    .email(email)
+                    .sns("LOCAL")
+                    .userParties(new ArrayList<>())
+                    .deviceTokens(new ArrayList<>())
+                    .files(new ArrayList<>())
+                    .build();
     }
 }

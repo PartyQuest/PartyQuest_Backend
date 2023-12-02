@@ -261,7 +261,7 @@ class PartyServiceImplTest {
         }
         Long member = userPartyRepository.countPartyMember(party);
         System.out.println(member);
-        HashMap<String, Object> memberFromGrade = partyService.getMemberFromGrade(1L, PartyMemberType.NO_MEMBER);
+        List<PartyDto.ReadPartyMemberDto.Response> memberFromGrade = partyService.getMemberFromGrade(1L, PartyMemberType.NO_MEMBER);
         System.out.println(memberFromGrade.toString());
 
         userRepository.deleteAll();

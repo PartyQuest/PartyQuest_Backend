@@ -35,8 +35,6 @@ public class SecurityConfig {
     }
 
     @Autowired
-
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -58,5 +56,4 @@ public class SecurityConfig {
         http.addFilterBefore(jwtExceptionFilter,JwtAuthenticationFilter.class);
         return http.build();
     }
-
 }

@@ -2,7 +2,6 @@ package com.partyquest.backend.service.logic;
 
 import com.partyquest.backend.domain.type.PartyMemberType;
 
-import java.util.HashMap;
 import java.util.List;
 
 import static com.partyquest.backend.domain.dto.PartyDto.*;
@@ -14,10 +13,10 @@ public interface PartyService {
     ApplicationPartyDto.Response ApplicationParty(ApplicationPartyDto.Request requestDto, long userID);
     boolean deleteParty(List<Long> partyIds);
 
-    HashMap<String, Object> getMemberFromGrade(Long partyId, PartyMemberType grade);
+    List<ReadPartyMemberDto.Response> getMemberFromGrade(Long partyId, PartyMemberType grade);
     List<MembershipPartyDto.Response> getMembershipParties(long userId);
 
     ReadPartyDto.Response readPartySpecification(Long id);
-    void AcceptPartyApplicator(List<Long> userID);
+    void AcceptPartyApplicator(ApplicationPartyDto.AcceptRequest dto, long masterID);
 
 }

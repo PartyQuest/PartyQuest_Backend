@@ -59,10 +59,14 @@ public class PartyController {
     public ResponseEntity<?> FindMemberFromGradeController
             (
                 @AuthenticationPrincipal long id,
-                @RequestParam(value = "grade",required = false) String grade,
+                @RequestParam(value = "grade", required = false) String grade,
                 @RequestParam(value = "partyID") Long partyID
             )
     {
+        if(grade == null) {
+            return ResponseEntityFactory.okResponse(partyService.getMemberFromGrade(partyID, null));
+        }
+        log.info(JsonEnumTypeConfig.fromString(PartyMemberType.class,grade).toString()+" "+partyID);
         return ResponseEntityFactory.okResponse(partyService.getMemberFromGrade(partyID, JsonEnumTypeConfig.fromString(PartyMemberType.class, grade)));
     }
 
@@ -72,10 +76,11 @@ public class PartyController {
         return ResponseEntityFactory.okResponse(parties);
     }
 
-    @PostMapping("/application/accept")
+    @PatchMapping("/application")
     public ResponseEntity<?> AcceptPartyApplicator(@AuthenticationPrincipal long id,
-                                                   @RequestBody List<Long> userID)
+                                                   @RequestBody PartyDto.ApplicationPartyDto.AcceptRequest dto)
     {
-        return null;
+        partyService.AcceptPartyApplicator(dto,id);
+        return ResponseEntityFactory.noResponse();
     }
 }

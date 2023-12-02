@@ -35,7 +35,7 @@ public class Party extends DataCheck {
     @OneToMany(mappedBy = "party", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserParty> userParties = new java.util.ArrayList<>();
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "party", orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "party", cascade = CascadeType.ALL, orphanRemoval = true)
     @BatchSize(size = 100)
     private List<File> files = new java.util.ArrayList<>();
 

@@ -13,6 +13,11 @@ public interface UserPartyRepositoryCustom {
     Optional<UserParty> existEntryUser(Party party, User user);
     List<UserParty> findByParty(Party party);
     Long countPartyMember(Party party);
-    List<RepositoryDto.UserApplicatorRepositoryDto> findMemberFromGrade(Party party, PartyMemberType grade);
+    List<RepositoryDto.PartyMemberVO> findMemberFromGrade(Long partyID, PartyMemberType grade);
     List<RepositoryDto.MembershipDto> findMembershipUser(User user);
+    boolean updateAcceptApplicator(List<Long> userID);
+    boolean isMasterAndAdminUser(User user, Party party);
+    boolean isMasterAndAdminUserTmp(Long userID, Long partyID);
+    boolean isApplicationUser(List<Long> userID, Long PartyID);
+    List<UserParty> testcode();
 }

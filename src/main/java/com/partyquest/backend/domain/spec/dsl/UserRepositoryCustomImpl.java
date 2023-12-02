@@ -5,6 +5,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.partyquest.backend.domain.entity.QUser.user;
@@ -31,4 +32,10 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 
         return Optional.ofNullable(fetchOne);
     }
+
+    @Override
+    public boolean isUser(List<Long> userID) {
+        return jpaQueryFactory.select(user.count()).from(user).where(user.id.in(userID)).fetchOne() == userID.size();
+    }
+
 }

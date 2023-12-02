@@ -64,4 +64,18 @@ public class GlobalExceptionHandler {
         ErrorResponse response = new ErrorResponse(ex.getErrorCode());
         return new ResponseEntity<>(response,HttpStatus.valueOf(ex.getErrorCode().getStatus()));
     }
+
+    @ExceptionHandler(NotAdminException.class)
+    public ResponseEntity<ErrorResponse> handleNotAdminException(NotAdminException ex) {
+        log.error("handleNotAdminException",ex);
+        ErrorResponse response = new ErrorResponse(ex.getErrorCode());
+        return new ResponseEntity<>(response,HttpStatus.valueOf(ex.getErrorCode().getStatus()));
+    }
+
+    @ExceptionHandler(NotPartyMemberException.class)
+    public ResponseEntity<ErrorResponse> handleNotPartyMemberException(NotPartyMemberException ex) {
+        log.error("handleNotPartyMemberException",ex);
+        ErrorResponse response = new ErrorResponse(ex.getErrorCode());
+        return new ResponseEntity<>(response,HttpStatus.valueOf(ex.getErrorCode().getStatus()));
+    }
 }
