@@ -153,10 +153,17 @@ public class UserPartyRepositoryCustomImpl implements UserPartyRepositoryCustom{
                 .join(userParty.user, user)
                 .where(
                         userParty.party.id.eq(PartyID),
-                        userParty.user.id.in(userID)
+                        userParty.user.id.in(userID),
+                        userParty.registered.eq(false),
+                        userParty.memberGrade.eq(PartyMemberType.NO_MEMBER)
                 ).fetchOne();
         if(one == userID.size()) return true;
         else return false;
+    }
+
+    @Override
+    public boolean existsByUsers(List<Long> userID, Long PartyID) {
+        return false;
     }
 
     @Override
