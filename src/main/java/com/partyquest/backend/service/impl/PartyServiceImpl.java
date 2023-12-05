@@ -146,7 +146,7 @@ public class PartyServiceImpl implements PartyService {
         ApplicationPartyDto.Response response = ApplicationPartyDto.Response.builder()
                 .partyId(party.getId())
                 .userPartyId(userParty.getId())
-                .userId(userParty.getId())
+                .userId(user.getId())
                 .build();
 
         return response;
@@ -220,21 +220,57 @@ public class PartyServiceImpl implements PartyService {
                 .build();
     }
 
+    /**
+     * 파티가입 신청한 유저를 승인 처리하는 메소드
+     * @param dto 클라이언트로 입력받은 데이터
+     * @param masterID 요청한 클라이언트의 레퍼런스 아이디
+     * @throws EmailNotFoundException 회원 검증
+     * @throws NotPartyMemberException 신청자 검증
+     * @throws NotAdminException 요청자 등급 검증
+     */
     @Override
     public void AcceptPartyApplicator(ApplicationPartyDto.AcceptRequest dto, long masterID) {
         //입력 값 - 유저 데이터 검증
-        if(!userRepository.isUser(dto.getUserID()))
-            throw new EmailNotFoundException("NOT FOUND USER",ErrorCode.EMAIL_NOT_FOUND);
+        CheckIsUser(dto.getUserID());
 
         //유저 데이터가 정확히 해당 파티를 신청했는지 검증 -> userParty 테이블에서 dto.getPartyID로 파티 일치하는지 조회
         if(!userPartyRepository.isApplicationUser(dto.getUserID(),dto.getPartyID()))
             throw new NotPartyMemberException("NOT PARTY MEMBER",ErrorCode.NOT_PARTY_MEMBER);
 
         //파티 마스터가 정확히 권한을 가지고 있는 유저인가?
-        if(!userPartyRepository.isMasterAndAdminUserTmp(masterID, dto.getPartyID()))
-            throw new NotAdminException("NOT ADMIN USER",ErrorCode.ACCESS_DENIED);
+        CheckIsAdmin(masterID,dto.getPartyID());
 
 
         userPartyRepository.updateAcceptApplicator(dto.getUserID());
+    }
+
+    /**
+     * 파티 멤버를 추방하거나 신청한 유저를 거절하는 메소드
+     * @param dto 클라이언트로 입력받은 데이터
+     * @param masterID 요청한 클라이언트의 레퍼런스 아이디
+     * @throws EmailNotFoundException 회원검증
+     * @throws NotAdminException 요청자 등급 검증
+     * @throws PartyMemberException 대상 멤버 유효성 검증
+     * */
+    @Override
+    public void BannedAndRejectPartyMember(BannedMemberDto.Request dto, long masterID) {
+        CheckIsUser(dto.getUserID());
+        CheckIsAdmin(masterID, dto.getPartyID());
+        CheckPartyMember(dto.getUserID(),dto.getPartyID());
+        userPartyRepository.updateBannedAndRejectMember(dto.getPartyID(),dto.getUserID());
+    }
+
+    private void CheckIsUser(List<Long> userID) {
+        if(!userRepository.isUser(userID))
+            throw new EmailNotFoundException("NOT FOUND USER",ErrorCode.EMAIL_NOT_FOUND);
+    }
+
+    private void CheckIsAdmin(Long masterID, Long partyID) {
+        if(!userPartyRepository.isMasterAndAdminUserTmp(masterID, partyID))
+            throw new NotAdminException("NOT ADMIN USER",ErrorCode.ACCESS_DENIED);
+    }
+    private void CheckPartyMember(List<Long> userID, Long partyID) {
+        if(!userPartyRepository.existsByUsers(userID,partyID))
+            throw new PartyMemberException("NOT PARTY MEMBER",ErrorCode.PARTY_MEMBER_ERROR);
     }
 }

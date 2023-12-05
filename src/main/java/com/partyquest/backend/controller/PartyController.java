@@ -2,6 +2,8 @@ package com.partyquest.backend.controller;
 
 import com.partyquest.backend.config.JsonEnumTypeConfig;
 import com.partyquest.backend.config.ResponseEntityFactory;
+import com.partyquest.backend.config.exception.ErrorCode;
+import com.partyquest.backend.config.exception.PartyMemberException;
 import com.partyquest.backend.domain.dto.PartyDto;
 import com.partyquest.backend.domain.dto.ResponseWrapper;
 import com.partyquest.backend.domain.type.PartyMemberType;
@@ -81,6 +83,16 @@ public class PartyController {
                                                    @RequestBody PartyDto.ApplicationPartyDto.AcceptRequest dto)
     {
         partyService.AcceptPartyApplicator(dto,id);
+        return ResponseEntityFactory.noResponse();
+    }
+
+    @DeleteMapping("/member")
+    public ResponseEntity<?> BannedMember(@AuthenticationPrincipal long id,
+                                          @RequestBody PartyDto.BannedMemberDto.Request dto) {
+        if(dto.getUserID().contains(id)) {
+            throw new PartyMemberException("DO NOT BANNED YOURSELF", ErrorCode.PARTY_MEMBER_ERROR);
+        }
+        partyService.BannedAndRejectPartyMember(dto,id);
         return ResponseEntityFactory.noResponse();
     }
 }

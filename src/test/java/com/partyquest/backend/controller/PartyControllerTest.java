@@ -2,6 +2,7 @@ package com.partyquest.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.partyquest.backend.config.WithAccount;
+import com.partyquest.backend.domain.entity.UserParty;
 import com.partyquest.backend.domain.repository.FileRepository;
 import com.partyquest.backend.domain.repository.PartyRepository;
 import com.partyquest.backend.domain.repository.UserPartyRepository;
@@ -26,8 +27,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -444,6 +444,145 @@ class PartyControllerTest {
         @Test
         @Order(999)
         @DisplayName("데이터베이스 초기화")
+        void init() {
+            fileRepository.deleteAll();
+            userPartyRepository.deleteAll();
+            partyRepository.deleteAll();
+            userRepository.deleteAll();
+        }
+    }
+    @Nested
+    @DisplayName("파티원_추방_및_신청_거절")
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+    class BannedAndRejectMemberTest {
+        public static long partyID;
+        public static List<Long> userID_BR = new ArrayList<>();
+        @Test
+        @Order(1)
+        @DisplayName("사전작업01=파티_생성")
+        @WithAccount("preprocessing_make_party_reject_banned_tester01")
+        void preprocessing_make_party_reject_banned_test() throws Exception{
+            CreatePartyDto.Request request = makeParty("preprocess_party_title",
+                    "preprocess_party_description");
+            MvcResult result = mockMvc.perform(
+                    post("/party")
+                            .contentType("application/json")
+                            .accept("application/json")
+                            .content(objectMapper.writeValueAsString(request))
+            ).andReturn();
+            List<HashMap<String,Object>> td = (List<HashMap<String, Object>>) objectMapper.readValue(result.getResponse().getContentAsString(),HashMap.class).get("data");
+            partyID = (long)(int)td.get(0).get("id");
+        }
+
+        @Test
+        @Order(2)
+        @DisplayName("사전작업02=파티_신청")
+        @WithAccount("preprocessing_application_party_bannedAndReject_tester01")
+        void preprocessing_application_party_test() throws Exception {
+            ApplicationPartyDto.Request request = ApplicationPartyDto.Request.builder()
+                    .partyId(partyID)
+                    .partyName("preprocess_party_title")
+                    .build();
+            MvcResult result = mockMvc.perform(
+                    post("/party/application")
+                            .contentType("application/json")
+                            .accept("application/json")
+                            .content(objectMapper.writeValueAsString(request))
+            ).andExpect(status().isOk()).andReturn();
+
+            List<HashMap<String,Object>> data = (List<HashMap<String, Object>>) objectMapper.readValue(result.getResponse().getContentAsString(), HashMap.class).get("data");
+            userID_BR.add((long)(int)data.get(0).get("userId"));
+        }
+
+        @Test
+        @Order(3)
+        @DisplayName("사전작업03=파티_가입_승인")
+        @WithAccount("preprocessing_make_party_reject_banned_tester01")
+        void preprocessing_accept_party() throws Exception{
+            System.out.println("사전작업03=파티_가입_승인"+userID_BR.toString());
+            ApplicationPartyDto.AcceptRequest request = ApplicationPartyDto.AcceptRequest
+                    .builder()
+                    .userID(userID_BR)
+                    .partyID(partyID)
+                    .build();
+
+            mockMvc.perform(
+                    patch("/party/application")
+                            .contentType("application/json")
+                            .accept("application/json")
+                            .content(objectMapper.writeValueAsString(request))
+            ).andExpect(status().isNoContent());
+        }
+
+        @Test
+        @Order(4)
+        @DisplayName("메인테스트01=파티원_추방_성공")
+        @WithAccount("preprocessing_make_party_reject_banned_tester01")
+        void banned_test_01() throws Exception{
+            BannedMemberDto.Request request = BannedMemberDto.Request
+                    .builder()
+                    .partyID(partyID)
+                    .userID(userID_BR)
+                    .build();
+
+            mockMvc.perform(
+                    delete("/party/member")
+                            .contentType("application/json")
+                            .accept("application/json")
+                            .content(objectMapper.writeValueAsString(request))
+            ).andExpect(status().isNoContent());
+
+            userID_BR.clear();
+            System.out.println("클리어"+userID_BR.toString());
+        }
+        @Test
+        @Order(5)
+        @DisplayName("사전작업04=파티_재신청")
+        @WithAccount("preprocessing_application_party_bannedAndReject_tester01")
+        void preprocessing_application_party_test2() throws Exception {
+            ApplicationPartyDto.Request request = ApplicationPartyDto.Request.builder()
+                    .partyId(partyID)
+                    .partyName("preprocess_party_title")
+                    .build();
+            MvcResult result = mockMvc.perform(
+                    post("/party/application")
+                            .contentType("application/json")
+                            .accept("application/json")
+                            .content(objectMapper.writeValueAsString(request))
+            ).andReturn();
+
+            List<HashMap<String,Object>> data = (List<HashMap<String, Object>>) objectMapper.readValue(result.getResponse().getContentAsString(), HashMap.class).get("data");
+            userID_BR.add((long)(int)data.get(0).get("userId"));
+        }
+
+        @Test
+        @Order(6)
+        @DisplayName("사전작업05=파티_신청_거절")
+        @WithAccount("preprocessing_make_party_reject_banned_tester01")
+        void re_accept() throws Exception{
+            System.out.println("파티원 추방 성공"+userID_BR.toString());
+            BannedMemberDto.Request request = BannedMemberDto.Request
+                    .builder()
+                    .partyID(partyID)
+                    .userID(userID_BR)
+                    .build();
+
+            mockMvc.perform(
+                    delete("/party/member")
+                            .contentType("application/json")
+                            .accept("application/json")
+                            .content(objectMapper.writeValueAsString(request))
+            ).andExpect(status().isNoContent());
+
+            Optional<UserParty> id = userPartyRepository.findById(2L);
+
+            System.out.println(id.get().getIsDelete());
+            userID_BR = new ArrayList<>();
+        }
+
+        @Test
+        @Order(999)
+        @DisplayName("데이터베이스_초기화")
         void init() {
             fileRepository.deleteAll();
             userPartyRepository.deleteAll();

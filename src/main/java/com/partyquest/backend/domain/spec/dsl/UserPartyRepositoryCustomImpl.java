@@ -126,6 +126,24 @@ public class UserPartyRepositoryCustomImpl implements UserPartyRepositoryCustom{
     }
 
     @Override
+    @Transactional
+    public boolean updateBannedAndRejectMember(Long partyID, List<Long> userID) {
+        try {
+            jpaQueryFactory
+                    .update(userParty)
+                    .set(userParty.registered, false)
+                    .set(userParty.isDelete, true)
+                    .where(
+                            userParty.user.id.in(userID),
+                            userParty.party.id.eq(partyID)
+                    ).execute();
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
+        return false;
+    }
+
+    @Override
     public boolean isMasterAndAdminUser(User user, Party party) {
         return false;
     }
@@ -141,29 +159,34 @@ public class UserPartyRepositoryCustomImpl implements UserPartyRepositoryCustom{
                         user.id.eq(userID),
                         userParty.partyAdmin.eq(true)
                 ).fetchOne();
-        if(fetch == null) return false;
-        return true;
+        return fetch != null;
     }
 
     @Override
     public boolean isApplicationUser(List<Long> userID, Long PartyID) {
         Long one = jpaQueryFactory.select(userParty.count())
                 .from(userParty)
-                .join(userParty.party, party)
-                .join(userParty.user, user)
+//                .join(userParty.party, party)
+//                .join(userParty.user, user)
                 .where(
                         userParty.party.id.eq(PartyID),
                         userParty.user.id.in(userID),
                         userParty.registered.eq(false),
                         userParty.memberGrade.eq(PartyMemberType.NO_MEMBER)
                 ).fetchOne();
-        if(one == userID.size()) return true;
-        else return false;
+        return one == userID.size();
     }
 
     @Override
     public boolean existsByUsers(List<Long> userID, Long PartyID) {
-        return false;
+        Long one = jpaQueryFactory
+                .select(userParty.count())
+                .from(userParty)
+                .where(
+                        userParty.party.id.eq(PartyID),
+                        userParty.user.id.in(userID)
+                ).fetchOne();
+        return one == userID.size();
     }
 
     @Override
@@ -179,6 +202,7 @@ public class UserPartyRepositoryCustomImpl implements UserPartyRepositoryCustom{
                 .where(
                         userParty.party.eq(party),
                         userParty.user.eq(user)
+//                        userParty.isDelete.eq(false)
                 ).fetchOne());
     }
 }

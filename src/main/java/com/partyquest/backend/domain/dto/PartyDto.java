@@ -173,4 +173,17 @@ public class PartyDto {
             private long partyMemberCnt;
         }
     }
+
+    @Data
+    @Builder
+    public static class BannedMemberDto {
+        @Data
+        @Builder
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class Request {
+            private Long partyID;
+            private List<Long> userID;
+        }
+    }
 }
