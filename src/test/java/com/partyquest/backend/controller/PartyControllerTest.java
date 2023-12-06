@@ -590,4 +590,78 @@ class PartyControllerTest {
             userRepository.deleteAll();
         }
     }
+
+    @Nested
+    @DisplayName("파티를_탈퇴한다")
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+    class WithdrawTest {
+        public static Long partyID;
+        public static List<Long> userID = new ArrayList<>();
+        @Test
+        @Order(1)
+        @DisplayName("사전작업01=파티_생성")
+        @WithAccount("preprocessing_make_party_withdraw_tester01")
+        void preprocessing_make_party_reject_banned_test() throws Exception{
+            CreatePartyDto.Request request = makeParty("preprocess_party_title",
+                    "preprocess_party_description");
+            MvcResult result = mockMvc.perform(
+                    post("/party")
+                            .contentType("application/json")
+                            .accept("application/json")
+                            .content(objectMapper.writeValueAsString(request))
+            ).andReturn();
+            List<HashMap<String,Object>> td = (List<HashMap<String, Object>>) objectMapper.readValue(result.getResponse().getContentAsString(),HashMap.class).get("data");
+            partyID = (long)(int)td.get(0).get("id");
+        }
+
+        @Test
+        @Order(2)
+        @DisplayName("사전작업02=파티_신청")
+        @WithAccount("preprocessing_application_party_withdraw_tester01")
+        void preprocessing_application_party_test() throws Exception {
+            ApplicationPartyDto.Request request = ApplicationPartyDto.Request.builder()
+                    .partyId(partyID)
+                    .partyName("preprocess_party_title")
+                    .build();
+            MvcResult result = mockMvc.perform(
+                    post("/party/application")
+                            .contentType("application/json")
+                            .accept("application/json")
+                            .content(objectMapper.writeValueAsString(request))
+            ).andExpect(status().isOk()).andReturn();
+
+            List<HashMap<String,Object>> data = (List<HashMap<String, Object>>) objectMapper.readValue(result.getResponse().getContentAsString(), HashMap.class).get("data");
+            userID.add((long)(int)data.get(0).get("userId"));
+        }
+
+        @Test
+        @Order(3)
+        @DisplayName("사전작업03=파티_가입_승인")
+        @WithAccount("preprocessing_make_party_withdraw_tester01")
+        void preprocessing_accept_party() throws Exception{
+            ApplicationPartyDto.AcceptRequest request = ApplicationPartyDto.AcceptRequest
+                    .builder()
+                    .userID(userID)
+                    .partyID(partyID)
+                    .build();
+
+            mockMvc.perform(
+                    patch("/party/application")
+                            .contentType("application/json")
+                            .accept("application/json")
+                            .content(objectMapper.writeValueAsString(request))
+            ).andExpect(status().isNoContent());
+        }
+
+        @Test
+        @Order(4)
+        @DisplayName("메인테스트01=파티_탈퇴")
+        @WithAccount("preprocessing_application_party_withdraw_tester01")
+        void main_test01() throws Exception{
+            mockMvc.perform(
+                    delete("/party/member/my-parties")
+                            .param("partyID",partyID.toString())
+            ).andExpect(status().isNoContent());
+        }
+    }
 }

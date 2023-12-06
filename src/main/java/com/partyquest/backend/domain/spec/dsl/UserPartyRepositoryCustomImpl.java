@@ -127,7 +127,7 @@ public class UserPartyRepositoryCustomImpl implements UserPartyRepositoryCustom{
 
     @Override
     @Transactional
-    public boolean updateBannedAndRejectMember(Long partyID, List<Long> userID) {
+    public boolean updateRegisterAndisDeleteFalse(Long partyID, List<Long> userID) {
         try {
             jpaQueryFactory
                     .update(userParty)
@@ -187,12 +187,6 @@ public class UserPartyRepositoryCustomImpl implements UserPartyRepositoryCustom{
                         userParty.user.id.in(userID)
                 ).fetchOne();
         return one == userID.size();
-    }
-
-    @Override
-    public List<UserParty> testcode() {
-        return jpaQueryFactory
-                .selectFrom(userParty).join(userParty.party,party).join(userParty.user,user).fetch();
     }
 
     @Override

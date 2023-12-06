@@ -20,6 +20,5 @@ public interface UserPartyRepositoryCustom {
     boolean isMasterAndAdminUserTmp(Long userID, Long partyID);
     boolean isApplicationUser(List<Long> userID, Long PartyID);
     boolean existsByUsers(List<Long> userID, Long PartyID);
-    boolean updateBannedAndRejectMember(Long partyID, List<Long> userID);
-    List<UserParty> testcode();
+    boolean updateRegisterAndisDeleteFalse(Long partyID, List<Long> userID);
 }

@@ -95,4 +95,10 @@ public class PartyController {
         partyService.BannedAndRejectPartyMember(dto,id);
         return ResponseEntityFactory.noResponse();
     }
+
+    @DeleteMapping("/member/my-parties")
+    public ResponseEntity<?> WithdrawParty(@AuthenticationPrincipal long id, @RequestParam Long partyID) {
+        partyService.WithdrawParty(id, partyID);
+        return ResponseEntityFactory.noResponse();
+    }
 }

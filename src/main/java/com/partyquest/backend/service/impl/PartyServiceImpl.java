@@ -257,7 +257,15 @@ public class PartyServiceImpl implements PartyService {
         CheckIsUser(dto.getUserID());
         CheckIsAdmin(masterID, dto.getPartyID());
         CheckPartyMember(dto.getUserID(),dto.getPartyID());
-        userPartyRepository.updateBannedAndRejectMember(dto.getPartyID(),dto.getUserID());
+        userPartyRepository.updateRegisterAndisDeleteFalse(dto.getPartyID(),dto.getUserID());
+    }
+
+    @Override
+    public void WithdrawParty(long userID, Long partyID) {
+        CheckIsUser(List.of(userID));
+        CheckIsParty(partyID);
+        CheckPartyMember(List.of(userID),partyID);
+        userPartyRepository.updateRegisterAndisDeleteFalse(partyID, List.of(userID));
     }
 
     private void CheckIsUser(List<Long> userID) {
@@ -272,5 +280,11 @@ public class PartyServiceImpl implements PartyService {
     private void CheckPartyMember(List<Long> userID, Long partyID) {
         if(!userPartyRepository.existsByUsers(userID,partyID))
             throw new PartyMemberException("NOT PARTY MEMBER",ErrorCode.PARTY_MEMBER_ERROR);
+    }
+
+    private void CheckIsParty(Long partyID) {
+        if(!partyRepository.existsById(partyID)) {
+            throw new PartyNotFoundException("NOT FOUND PARTY",ErrorCode.PARTY_NOT_FOUND);
+        }
     }
 }
