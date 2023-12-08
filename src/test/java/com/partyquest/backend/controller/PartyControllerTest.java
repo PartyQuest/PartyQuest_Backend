@@ -7,6 +7,7 @@ import com.partyquest.backend.domain.repository.FileRepository;
 import com.partyquest.backend.domain.repository.PartyRepository;
 import com.partyquest.backend.domain.repository.UserPartyRepository;
 import com.partyquest.backend.domain.repository.UserRepository;
+import com.partyquest.backend.domain.type.PartyMemberType;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
@@ -662,6 +663,91 @@ class PartyControllerTest {
                     delete("/party/member/my-parties")
                             .param("partyID",partyID.toString())
             ).andExpect(status().isNoContent());
+        }
+    }
+
+    @Nested
+    @DisplayName("파티원의 등급을 변경한다.")
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+    class ChangeGradeTest {
+
+        public static long partyID;
+        public static List<Long> userID = new ArrayList<Long>();
+
+        @Test
+        @Order(1)
+        @DisplayName("사전작업01=파티생성")
+        @WithAccount("pre_modify_grade_maker01")
+        void test01() throws Exception {
+            CreatePartyDto.Request request = makeParty("preprocess_party_title",
+                    "preprocess_party_description");
+            MvcResult result = mockMvc.perform(
+                    post("/party")
+                            .contentType("application/json")
+                            .accept("application/json")
+                            .content(objectMapper.writeValueAsString(request))
+            ).andReturn();
+            List<HashMap<String,Object>> td = (List<HashMap<String, Object>>) objectMapper.readValue(result.getResponse().getContentAsString(),HashMap.class).get("data");
+            partyID = (long)(int)td.get(0).get("id");
+        }
+        @Test
+        @Order(2)
+        @DisplayName("사전작업02=파티가입")
+        @WithAccount("pre_modify_grade_application01")
+        void preprocessing_application_party_test() throws Exception {
+            ApplicationPartyDto.Request request = ApplicationPartyDto.Request.builder()
+                    .partyId(partyID)
+                    .partyName("preprocess_party_title")
+                    .build();
+            MvcResult result = mockMvc.perform(
+                    post("/party/application")
+                            .contentType("application/json")
+                            .accept("application/json")
+                            .content(objectMapper.writeValueAsString(request))
+            ).andExpect(status().isOk()).andReturn();
+
+            List<HashMap<String,Object>> data = (List<HashMap<String, Object>>) objectMapper.readValue(result.getResponse().getContentAsString(), HashMap.class).get("data");
+            userID.add((long)(int)data.get(0).get("userId"));
+        }
+
+        @Test
+        @Order(3)
+        @DisplayName("사전작업03=파티_가입_승인")
+        @WithAccount("pre_modify_grade_maker01")
+        void preprocessing_accept_party() throws Exception{
+            ApplicationPartyDto.AcceptRequest request = ApplicationPartyDto.AcceptRequest
+                    .builder()
+                    .userID(userID)
+                    .partyID(partyID)
+                    .build();
+
+            mockMvc.perform(
+                    patch("/party/application")
+                            .contentType("application/json")
+                            .accept("application/json")
+                            .content(objectMapper.writeValueAsString(request))
+            ).andExpect(status().isNoContent());
+        }
+
+        @Test
+        @Order(4)
+        @DisplayName("메인테스트01=파티원_등급_변경")
+        @WithAccount("pre_modify_grade_maker01")
+        void main_test_01() throws Exception{
+            ModifyMemberGradeDto.ModifyMember inner = ModifyMemberGradeDto.ModifyMember.builder()
+                    .grade(PartyMemberType.ADMIN)
+                    .memberID(userID.get(0))
+                    .build();
+            ModifyMemberGradeDto.Request request = ModifyMemberGradeDto.Request.builder()
+                    .members(List.of(inner))
+                    .partyID(partyID)
+                    .build();
+            mockMvc.perform(
+                    patch("/party/member")
+                            .contentType("application/json")
+                            .accept("application/json")
+                            .content(objectMapper.writeValueAsString(request))
+            ).andDo(print());
         }
     }
 }

@@ -268,6 +268,26 @@ public class PartyServiceImpl implements PartyService {
         userPartyRepository.updateRegisterAndisDeleteFalse(partyID, List.of(userID));
     }
 
+    @Override
+    public void ModifyPartyMemberGrade(long userID, ModifyMemberGradeDto.Request dto) {
+        CheckIsUser(List.of(userID));
+        CheckIsAdmin(userID,dto.getPartyID());
+        CheckIsParty(dto.getPartyID());
+
+        List<Long> memberIDs = dto.getMembers()
+                .stream()
+                .map(ModifyMemberGradeDto.ModifyMember::getMemberID)
+                .collect(Collectors.toList());
+
+        CheckIsUser(memberIDs);
+        CheckPartyMember(memberIDs,dto.getPartyID());
+
+        //검증 끝
+        for (ModifyMemberGradeDto.ModifyMember member : dto.getMembers()) {
+            userPartyRepository.updateUserPartyMemberGrade(dto.getPartyID(),member.getMemberID(),member.getGrade());
+        }
+    }
+
     private void CheckIsUser(List<Long> userID) {
         if(!userRepository.isUser(userID))
             throw new EmailNotFoundException("NOT FOUND USER",ErrorCode.EMAIL_NOT_FOUND);

@@ -144,6 +144,34 @@ public class UserPartyRepositoryCustomImpl implements UserPartyRepositoryCustom{
     }
 
     @Override
+    @Transactional
+    public boolean updateUserPartyMemberGrade(Long partyID, long userID, PartyMemberType grade) {
+        try {
+            if(grade == PartyMemberType.ADMIN || grade == PartyMemberType.MASTER) {
+                jpaQueryFactory
+                        .update(userParty)
+                        .set(userParty.memberGrade, grade)
+                        .set(userParty.partyAdmin,true)
+                        .where(
+                                userParty.party.id.eq(partyID),
+                                userParty.user.id.eq(userID)
+                        ).execute();
+            } else {
+                jpaQueryFactory
+                        .update(userParty)
+                        .set(userParty.memberGrade, grade)
+                        .where(
+                                userParty.party.id.eq(partyID),
+                                userParty.user.id.eq(userID)
+                        ).execute();
+            }
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
+    }
+
+    @Override
     public boolean isMasterAndAdminUser(User user, Party party) {
         return false;
     }

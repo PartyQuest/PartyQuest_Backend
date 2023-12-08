@@ -101,4 +101,11 @@ public class PartyController {
         partyService.WithdrawParty(id, partyID);
         return ResponseEntityFactory.noResponse();
     }
+
+    @PatchMapping("/member")
+    public ResponseEntity<?> ModifyMemberGrade(@AuthenticationPrincipal long id,
+                                               @RequestBody PartyDto.ModifyMemberGradeDto.Request dto) {
+        partyService.ModifyPartyMemberGrade(id,dto);
+        return ResponseEntityFactory.noResponse();
+    }
 }

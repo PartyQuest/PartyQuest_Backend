@@ -186,4 +186,27 @@ public class PartyDto {
             private List<Long> userID;
         }
     }
+
+    @Data
+    @Builder
+    public static class ModifyMemberGradeDto {
+
+        @Data
+        @Builder
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class ModifyMember {
+            private long memberID;
+            private PartyMemberType grade;
+        }
+
+        @Data
+        @Builder
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class Request {
+            private Long partyID;
+            private List<ModifyMember> members;
+        }
+    }
 }

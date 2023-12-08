@@ -21,5 +21,6 @@ public interface PartyService {
     void AcceptPartyApplicator(ApplicationPartyDto.AcceptRequest dto, long masterID);
     void BannedAndRejectPartyMember(BannedMemberDto.Request dto, long masterID);
     void WithdrawParty(long userID, Long partyID);
+    void ModifyPartyMemberGrade(long userID, ModifyMemberGradeDto.Request dto);
 
 }
