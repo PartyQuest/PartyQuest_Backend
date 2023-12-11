@@ -177,4 +177,23 @@ public class AuthServiceImpl implements AuthService {
                 .accessToken(tokens[0])
                 .build();
     }
+
+    @Override
+    public AuthDto.UserSpecificationDto.Response getUserSpecificationByID(long userID) {
+        return
+                userRepository.findById(userID)
+                        .map(user -> AuthDto.UserSpecificationDto.Response.builder()
+                                .id(user.getId())
+                                .email(user.getEmail())
+                                .nickname(user.getNickname())
+                                .SNS(user.getSns())
+                                .build())
+                        .orElseThrow(() -> new EmailNotFoundException("NOT FOUND USER",ErrorCode.PARTY_NOT_FOUND));
+    }
+
+    @Override
+    public void ChangeUserSpecification(long userID, AuthDto.UserSpecificationDto.Request dto) {
+        User user = userRepository.findById(userID).orElseThrow(() -> new EmailNotFoundException("NOT FOUND USER",ErrorCode.PARTY_NOT_FOUND));
+        user.setNickname(dto.getNickname());
+    }
 }

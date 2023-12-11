@@ -2,10 +2,10 @@ package com.partyquest.backend.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.partyquest.backend.config.WithAccount;
 import com.partyquest.backend.domain.dto.AuthDto;
 import com.partyquest.backend.service.logic.AuthService;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -20,6 +20,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -128,5 +129,25 @@ class AuthControllerTest {
                         pathParameters(parameterWithName("provider").description("OAuth Provider"))
                 )
         ).andDo(print()).andExpect(status().isOk());
+    }
+
+    @Nested
+    @DisplayName("회원_정보_수정")
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+    class ModifyAccountData {
+        @Test
+        @DisplayName("메인테스트01=회원_정보_수정")
+        @WithAccount("modify_account_tester01")
+        void modify_account() throws Exception{
+            AuthDto.UserSpecificationDto.Request request
+                    = AuthDto.UserSpecificationDto.Request.builder()
+                    .nickname("modify_nickname")
+                    .build();
+            mockMvc.perform(patch("/auth/member")
+                    .contentType("application/json")
+                    .content(objectMapper.writeValueAsString(request))
+                    .accept("application/json")
+            ).andDo(print());
+        }
     }
 }

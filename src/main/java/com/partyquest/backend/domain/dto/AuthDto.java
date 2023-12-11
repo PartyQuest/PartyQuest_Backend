@@ -87,4 +87,28 @@ public class AuthDto {
         private String refreshToken;
         private String email;
     }
+
+    @Data
+    @Builder
+    public static class UserSpecificationDto {
+
+        @Data
+        @Builder
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class Request {
+            private String nickname;
+        }
+
+        @Data
+        @Builder
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class Response {
+            private long id;
+            private String email;
+            private String nickname;
+            private String SNS;
+        }
+    }
 }

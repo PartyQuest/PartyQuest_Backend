@@ -13,7 +13,8 @@ public interface AuthService {
     String getEmailById(long id);
     User getUserByEmail(String email);
     AuthDto.LoginResponseDto OAuth2Login(AuthDto.OAuthLogin.Request dto,String provider);
-
     AuthDto.LoginResponseDto RefreshToken(HttpServletRequest request, HttpServletResponse response);
+    AuthDto.UserSpecificationDto.Response getUserSpecificationByID(long userID);
+    void ChangeUserSpecification(long userID ,AuthDto.UserSpecificationDto.Request dto);
 
 }

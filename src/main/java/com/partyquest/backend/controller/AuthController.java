@@ -26,7 +26,7 @@ public class AuthController {
     private final ProviderService providerService;
 
     @Autowired
-    public AuthController(AuthService authService,ProviderService providerService) {
+    public AuthController(AuthService authService, ProviderService providerService) {
         this.authService = authService;
         this.providerService = providerService;
     }
@@ -37,7 +37,7 @@ public class AuthController {
         String local = "LOCAL";
         AuthDto.SignupResponseDto result = authService.SignUp(dto, local);
         log.info(dto.getEmail());
-        return ResponseEntityFactory.createResponse("/user/{id}",result.getId(),result);
+        return ResponseEntityFactory.createResponse("/user/{id}", result.getId(), result);
     }
 
     @PostMapping("/login")
@@ -61,5 +61,17 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<?> RefreshToken(HttpServletRequest request, HttpServletResponse response) {
         return ResponseEntityFactory.okResponse(authService.RefreshToken(request, response));
+    }
+
+    @GetMapping("/member/my-account")
+    public ResponseEntity<?> GetMyAccountData(@AuthenticationPrincipal long id) {
+        return ResponseEntityFactory.okResponse(authService.getUserSpecificationByID(id));
+    }
+
+    @PatchMapping("/member")
+    public ResponseEntity<?> ModifyMyAccountData(@AuthenticationPrincipal long id,
+                                                 @RequestBody AuthDto.UserSpecificationDto.Request dto) {
+        authService.ChangeUserSpecification(id, dto);
+        return ResponseEntityFactory.noResponse();
     }
 }
