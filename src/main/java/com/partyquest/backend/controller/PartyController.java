@@ -108,4 +108,12 @@ public class PartyController {
         partyService.ModifyPartyMemberGrade(id,dto);
         return ResponseEntityFactory.noResponse();
     }
+
+    @PatchMapping("")
+    public ResponseEntity<?> ModifyPartySpecification(@AuthenticationPrincipal long id,
+                                                      @RequestBody PartyDto.ModifyPartySpecificationDto.Request dto) {
+
+        partyService.ModifyPartySpecification(id, dto);
+        return ResponseEntityFactory.noResponse();
+    }
 }

@@ -2,6 +2,7 @@ package com.partyquest.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.partyquest.backend.config.WithAccount;
+import com.partyquest.backend.domain.dto.PartyDto;
 import com.partyquest.backend.domain.entity.UserParty;
 import com.partyquest.backend.domain.repository.FileRepository;
 import com.partyquest.backend.domain.repository.PartyRepository;
@@ -748,6 +749,51 @@ class PartyControllerTest {
                             .accept("application/json")
                             .content(objectMapper.writeValueAsString(request))
             ).andDo(print());
+        }
+    }
+
+    @Nested
+    @DisplayName("파티_정보_변경")
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+    class ModifyPartySpecification {
+
+        public static Long partyID;
+
+        @Test
+        @Order(1)
+        @DisplayName("사전작업01=파티_생성")
+        @WithAccount("modify_party_specification")
+        void pre01() throws Exception{
+            CreatePartyDto.Request request = makeParty("preprocess_party_title",
+                    "preprocess_party_description");
+            MvcResult result = mockMvc.perform(
+                    post("/party")
+                            .contentType("application/json")
+                            .accept("application/json")
+                            .content(objectMapper.writeValueAsString(request))
+            ).andReturn();
+            List<HashMap<String,Object>> td = (List<HashMap<String, Object>>) objectMapper.readValue(result.getResponse().getContentAsString(),HashMap.class).get("data");
+            partyID = (long)(int)td.get(0).get("id");
+        }
+
+        @Test
+        @Order(2)
+        @DisplayName("메인테스트01=파티_정보_수정")
+        @WithAccount("modify_party_specification")
+        void main01() throws Exception {
+            PartyDto.ModifyPartySpecificationDto.Request request = ModifyPartySpecificationDto.Request.builder()
+                    .description("modify_des")
+                    .partyID(partyID)
+                    .title("modify_title")
+                    .build();
+
+            mockMvc.perform(
+                    patch("/party")
+                            .contentType("application/json")
+                            .accept("application/json")
+                            .content(objectMapper.writeValueAsString(request))
+            ).andDo(print());
+
         }
     }
 }

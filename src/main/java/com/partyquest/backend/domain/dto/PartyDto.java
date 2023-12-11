@@ -209,4 +209,18 @@ public class PartyDto {
             private List<ModifyMember> members;
         }
     }
+
+    @Data
+    @Builder
+    public static class ModifyPartySpecificationDto {
+        @Data
+        @Builder
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class Request {
+            private Long partyID;
+            private String title;
+            private String description;
+        }
+    }
 }

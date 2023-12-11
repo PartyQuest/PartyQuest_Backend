@@ -288,6 +288,19 @@ public class PartyServiceImpl implements PartyService {
         }
     }
 
+    @Override
+    public void ModifyPartySpecification(long userID, ModifyPartySpecificationDto.Request dto) {
+        CheckIsUser(List.of(userID));
+        CheckPartyMember(List.of(userID),dto.getPartyID());
+        CheckIsAdmin(userID,dto.getPartyID());
+
+        Party party = partyRepository.findById(dto.getPartyID())
+                .orElseThrow(() -> new PartyNotFoundException("NOT FOUND PARTY", ErrorCode.PARTY_NOT_FOUND));
+
+        party.setDescription(dto.getDescription());
+        party.setTitle(dto.getTitle());
+    }
+
     private void CheckIsUser(List<Long> userID) {
         if(!userRepository.isUser(userID))
             throw new EmailNotFoundException("NOT FOUND USER",ErrorCode.EMAIL_NOT_FOUND);
