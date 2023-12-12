@@ -14,4 +14,5 @@ public interface PartyRepositoryCustom {
     Optional<Party> getParty(long id);
     String findMasterNameByParty(Party searchParty);
     RepositoryDto.ReadPartyVO getPartiesTmp(long id);
+    void updateIsDeleteFromParty(Long partyID);
 }

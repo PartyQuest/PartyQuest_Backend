@@ -44,4 +44,8 @@ public class Quest extends DataCheck {
     @OneToMany(mappedBy = "quest", orphanRemoval = true)
     private Set<Quest> quests = new LinkedHashSet<>();
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "party")
+    private Party party;
+
 }

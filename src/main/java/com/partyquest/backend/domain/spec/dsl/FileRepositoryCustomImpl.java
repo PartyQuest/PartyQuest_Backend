@@ -7,6 +7,7 @@ import com.partyquest.backend.domain.type.FileType;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -51,5 +52,20 @@ public class FileRepositoryCustomImpl implements FileRepositoryCustom{
             map.put(tuple.get(file.user.id),tuple.get(file.filePath));
         }
         return map;
+    }
+
+    @Override
+    @Transactional
+    public boolean updateIsDeletedFromPartyID(Long id) {
+        try {
+            jpaQueryFactory.update(file)
+                    .set(file.isDelete, true)
+                    .where(
+                            file.party.id.eq(id)
+                    ).execute();
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
     }
 }

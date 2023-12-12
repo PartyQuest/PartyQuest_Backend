@@ -116,4 +116,10 @@ public class PartyController {
         partyService.ModifyPartySpecification(id, dto);
         return ResponseEntityFactory.noResponse();
     }
+
+    @DeleteMapping("")
+    public ResponseEntity<?> DeleteParty(@AuthenticationPrincipal long id, @RequestParam Long partyID) {
+        partyService.DeleteParty(id, partyID);
+        return ResponseEntityFactory.noResponse();
+    }
 }

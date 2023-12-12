@@ -172,6 +172,34 @@ public class UserPartyRepositoryCustomImpl implements UserPartyRepositoryCustom{
     }
 
     @Override
+    @Transactional
+    public boolean updateIsDeletePartyMember(Long partyID) {
+        try {
+
+            jpaQueryFactory
+                    .update(userParty)
+                    .set(userParty.isDelete, true)
+                    .where(userParty.party.id.eq(partyID)).execute();
+
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
+    }
+
+    @Override
+    public boolean existsMasterFromUserParty(long userID, Long partyID) {
+        UserParty fetch = jpaQueryFactory
+                .selectFrom(userParty)
+                .where(
+                        userParty.party.id.eq(partyID),
+                        userParty.user.id.eq(userID),
+                        userParty.memberGrade.eq(PartyMemberType.MASTER)
+                ).fetchOne();
+        return fetch != null;
+    }
+
+    @Override
     public boolean isMasterAndAdminUser(User user, Party party) {
         return false;
     }

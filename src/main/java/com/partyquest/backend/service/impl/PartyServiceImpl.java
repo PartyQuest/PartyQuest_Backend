@@ -7,10 +7,7 @@ import com.partyquest.backend.domain.entity.File;
 import com.partyquest.backend.domain.entity.Party;
 import com.partyquest.backend.domain.entity.User;
 import com.partyquest.backend.domain.entity.UserParty;
-import com.partyquest.backend.domain.repository.FileRepository;
-import com.partyquest.backend.domain.repository.PartyRepository;
-import com.partyquest.backend.domain.repository.UserPartyRepository;
-import com.partyquest.backend.domain.repository.UserRepository;
+import com.partyquest.backend.domain.repository.*;
 import com.partyquest.backend.domain.type.FileType;
 import com.partyquest.backend.domain.type.PartyMemberType;
 import com.partyquest.backend.service.logic.PartyService;
@@ -32,16 +29,19 @@ public class PartyServiceImpl implements PartyService {
     private final UserRepository userRepository;
     private final UserPartyRepository userPartyRepository;
     private final FileRepository fileRepository;
+    private final QuestRepository questRepository;
 
     @Autowired
     public PartyServiceImpl(PartyRepository partyRepository,
                             UserRepository userRepository,
                             UserPartyRepository userPartyRepository,
-                            FileRepository fileRepository) {
+                            FileRepository fileRepository,
+                            QuestRepository questRepository) {
         this.partyRepository = partyRepository;
         this.userRepository = userRepository;
         this.userPartyRepository = userPartyRepository;
         this.fileRepository = fileRepository;
+        this.questRepository = questRepository;
     }
 
     private User getUserData(long makerId) {
@@ -301,6 +301,24 @@ public class PartyServiceImpl implements PartyService {
         party.setTitle(dto.getTitle());
     }
 
+    @Override
+    public void DeleteParty(long userID, Long partyID) {
+        CheckIsUser(List.of(userID));
+        CheckIsParty(partyID);
+        CheckIsMaster(userID, partyID);
+
+        //소속 파티원 isDeleted => TRUE로 변경
+        userPartyRepository.updateIsDeletePartyMember(partyID);
+        //해당 파티의 퀘스트들 isDelete => TRUE로 변경
+        questRepository.updateIsDeleteQuestFromPartyID(partyID);
+        //해당 파티의 파일들 isDelete => TRUE로 변경
+        fileRepository.updateIsDeletedFromPartyID(partyID);
+        //파티 isDelete => TRUE로 변경
+        partyRepository.updateIsDeleteFromParty(partyID);
+        //TODO 파티 삭제 푸시알림 구현
+
+    }
+
     private void CheckIsUser(List<Long> userID) {
         if(!userRepository.isUser(userID))
             throw new EmailNotFoundException("NOT FOUND USER",ErrorCode.EMAIL_NOT_FOUND);
@@ -318,6 +336,12 @@ public class PartyServiceImpl implements PartyService {
     private void CheckIsParty(Long partyID) {
         if(!partyRepository.existsById(partyID)) {
             throw new PartyNotFoundException("NOT FOUND PARTY",ErrorCode.PARTY_NOT_FOUND);
+        }
+    }
+
+    private void CheckIsMaster(Long masterID, Long partyID) {
+        if(!userPartyRepository.existsMasterFromUserParty(masterID, partyID)) {
+            throw new NotAdminException("NOT MASTER", ErrorCode.ACCESS_DENIED);
         }
     }
 }

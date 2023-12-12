@@ -22,4 +22,6 @@ public interface UserPartyRepositoryCustom {
     boolean existsByUsers(List<Long> userID, Long PartyID);
     boolean updateRegisterAndisDeleteFalse(Long partyID, List<Long> userID);
     boolean updateUserPartyMemberGrade(Long partyID, long userID, PartyMemberType grade);
+    boolean existsMasterFromUserParty(long userID, Long partyID);
+    boolean updateIsDeletePartyMember(Long partyID);
 }

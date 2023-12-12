@@ -8,6 +8,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -125,7 +126,19 @@ public class PartyRepositoryCustomImpl implements PartyRepositoryCustom {
         );
     }
 
-
+    @Override
+    @Transactional
+    public void updateIsDeleteFromParty(Long partyID) {
+        try {
+            jpaQueryFactory
+                    .update(party)
+                    .set(party.isDelete, true)
+                    .where(party.id.eq(partyID))
+                    .execute();
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
+    }
 
     private BooleanExpression masterEq(String master) {
         return master != null? userParty.memberGrade.eq(PartyMemberType.MASTER).and(user.nickname.eq(master)) : null;

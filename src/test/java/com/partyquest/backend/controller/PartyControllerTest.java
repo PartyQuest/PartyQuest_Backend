@@ -793,7 +793,40 @@ class PartyControllerTest {
                             .accept("application/json")
                             .content(objectMapper.writeValueAsString(request))
             ).andDo(print());
+        }
+    }
 
+    @Nested
+    @DisplayName("파티_해산")
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+    class DeletePartyTest {
+        public static Long partyID;
+
+        @Test
+        @Order(1)
+        @DisplayName("사전작업01=파티_생성")
+        @WithAccount("delete_party_specification")
+        void pre01() throws Exception{
+            CreatePartyDto.Request request = makeParty("preprocess_party_title",
+                    "preprocess_party_description");
+            MvcResult result = mockMvc.perform(
+                    post("/party")
+                            .contentType("application/json")
+                            .accept("application/json")
+                            .content(objectMapper.writeValueAsString(request))
+            ).andReturn();
+            List<HashMap<String,Object>> td = (List<HashMap<String, Object>>) objectMapper.readValue(result.getResponse().getContentAsString(),HashMap.class).get("data");
+            partyID = (long)(int)td.get(0).get("id");
+        }
+
+        @Test
+        @Order(2)
+        @DisplayName("메인테스트01=파티_해산")
+        @WithAccount("delete_party_specification")
+        void main01() throws Exception {
+            mockMvc.perform(
+                    delete("/party").param("partyID",partyID.toString())
+            ).andDo(print()).andExpect(status().isNoContent());
         }
     }
 }

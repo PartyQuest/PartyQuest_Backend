@@ -4,10 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
 
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Builder
 @NoArgsConstructor
@@ -38,6 +35,9 @@ public class Party extends DataCheck {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "party", cascade = CascadeType.ALL, orphanRemoval = true)
     @BatchSize(size = 100)
     private List<File> files = new java.util.ArrayList<>();
+
+    @OneToMany(mappedBy = "party", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Quest> quests = new ArrayList<>();
 
     public void setIsDeleted(boolean isDeleted) {
         super.setIsDelete(isDeleted);
