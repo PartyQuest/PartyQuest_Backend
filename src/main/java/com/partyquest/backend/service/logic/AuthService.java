@@ -16,5 +16,6 @@ public interface AuthService {
     AuthDto.LoginResponseDto RefreshToken(HttpServletRequest request, HttpServletResponse response);
     AuthDto.UserSpecificationDto.Response getUserSpecificationByID(long userID);
     void ChangeUserSpecification(long userID ,AuthDto.UserSpecificationDto.Request dto);
+    void DeleteAccountData(long userID);
 
 }

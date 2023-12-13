@@ -9,46 +9,69 @@ import com.partyquest.backend.config.exception.ErrorCode;
 import com.partyquest.backend.domain.dto.AuthDto;
 import com.partyquest.backend.domain.entity.File;
 import com.partyquest.backend.domain.entity.User;
-import com.partyquest.backend.domain.repository.FileRepository;
-import com.partyquest.backend.domain.repository.UserRepository;
+import com.partyquest.backend.domain.repository.*;
+import com.partyquest.backend.domain.spec.dsl.BoardRepositoryCustomImpl;
 import com.partyquest.backend.domain.type.FileType;
 import com.partyquest.backend.service.impl.oauth2.AccessToken;
 import com.partyquest.backend.service.impl.oauth2.ProviderService;
 import com.partyquest.backend.service.impl.oauth2.profile.ProfileDto;
 import com.partyquest.backend.service.logic.AuthService;
+import com.partyquest.backend.service.logic.PartyService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class AuthServiceImpl implements AuthService {
 
-    private final UserRepository userRepository;
+
     private final TokenProvider tokenProvider;
     private final RedisDao redisDao;
     private final ProviderService providerService;
+    private final PartyService partyService;
+
     private final FileRepository fileRepository;
+    private final UserPartyRepository userPartyRepository;
+    private final PartyRepository partyRepository;
+    private final UserRepository userRepository;
+    private final QuestRepository questRepository;
+    private final BoardRepository boardRepository;
 
     @Value("${spring.social.bcrypt.key}")
     private String bcryptKey;
 
     @Autowired
-    public AuthServiceImpl(UserRepository userRepository,
-                           TokenProvider tokenProvider,
-                           RedisDao redisDao,
-                           ProviderService providerService,
-                           FileRepository fileRepository) {
+    public AuthServiceImpl(
+            UserRepository userRepository,
+            TokenProvider tokenProvider,
+            RedisDao redisDao,
+            ProviderService providerService,
+            FileRepository fileRepository,
+            UserPartyRepository userPartyRepository,
+            PartyRepository partyRepository,
+            PartyService partyService,
+            QuestRepository questRepository,
+            BoardRepository boardRepository
+    )
+    {
         this.userRepository = userRepository;
         this.tokenProvider = tokenProvider;
         this.redisDao = redisDao;
         this.providerService = providerService;
         this.fileRepository = fileRepository;
+        this.userPartyRepository = userPartyRepository;
+        this.partyRepository = partyRepository;
+        this.partyService = partyService;
+        this.questRepository = questRepository;
+        this.boardRepository = boardRepository;
     }
 
     @Override
@@ -195,5 +218,31 @@ public class AuthServiceImpl implements AuthService {
     public void ChangeUserSpecification(long userID, AuthDto.UserSpecificationDto.Request dto) {
         User user = userRepository.findById(userID).orElseThrow(() -> new EmailNotFoundException("NOT FOUND USER",ErrorCode.PARTY_NOT_FOUND));
         user.setNickname(dto.getNickname());
+    }
+
+    @Override
+    public void DeleteAccountData(long userID) {
+        //회원 검증
+        isUser(userID);
+        //탈퇴 대상 회원이 마스터인 파티를 찾고, 그 파티를 자동으로 해산
+        partyRepository.findByMyMasterPartyFromUserID(userID)
+                .forEach(partyID -> partyService.DeleteParty(userID, partyID));
+        //해당 회원이 작성한 퀘스트 내용 전부 삭제
+        questRepository.updateIsDeleteQuestFromUserID(userID);
+        //해당 회원이 작성한 게시글 내용 전부 삭제
+        boardRepository.updateIsDeleteFromUserID(userID);
+        //마스터가 아닌 소속 파티 전부 탈퇴처리
+        userPartyRepository.updateIsDeletePartyFromUserID(userID);
+        //해당 회원이 등록한 파일 메타데이터 정보 삭제
+        fileRepository.updateIsDeletedFromUserID(userID);
+
+        //회원 데이터 delete 처리
+        userRepository.updateIsDeleteFromUserID(userID);
+        //저장 토큰 삭제
+        Logout(userID);
+    }
+
+    private void isUser(long userID) {
+        userRepository.findById(userID).orElseThrow(() -> new EmailNotFoundException("NOT FOUND USER",ErrorCode.EMAIL_NOT_FOUND));
     }
 }

@@ -74,4 +74,10 @@ public class AuthController {
         authService.ChangeUserSpecification(id, dto);
         return ResponseEntityFactory.noResponse();
     }
+
+    @DeleteMapping("/member")
+    public ResponseEntity<?> DeleteAccountData(@AuthenticationPrincipal long id) {
+        authService.DeleteAccountData(id);
+        return ResponseEntityFactory.noResponse();
+    }
 }

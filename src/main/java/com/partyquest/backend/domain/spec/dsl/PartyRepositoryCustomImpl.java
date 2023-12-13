@@ -140,6 +140,16 @@ public class PartyRepositoryCustomImpl implements PartyRepositoryCustom {
         }
     }
 
+    @Override
+    public List<Long> findByMyMasterPartyFromUserID(long userID) {
+        return jpaQueryFactory.select(party.id)
+                .from(party)
+                .join(party.userParties, userParty)
+                .join(userParty.user, user)
+                .where(user.id.eq(userID))
+                .fetch();
+    }
+
     private BooleanExpression masterEq(String master) {
         return master != null? userParty.memberGrade.eq(PartyMemberType.MASTER).and(user.nickname.eq(master)) : null;
     }

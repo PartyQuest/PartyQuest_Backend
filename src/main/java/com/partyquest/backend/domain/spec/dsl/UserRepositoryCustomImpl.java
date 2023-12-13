@@ -2,6 +2,7 @@ package com.partyquest.backend.domain.spec.dsl;
 
 import com.partyquest.backend.domain.entity.User;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -38,4 +39,20 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
         return jpaQueryFactory.select(user.count()).from(user).where(user.id.in(userID)).fetchOne() == userID.size();
     }
 
+    @Override
+    @Transactional
+    public boolean updateIsDeleteFromUserID(Long userID) {
+        try {
+
+            jpaQueryFactory
+                    .update(user)
+                    .set(user.isDelete, true)
+                    .where(
+                            user.id.eq(userID)
+                    ).execute();
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
+    }
 }

@@ -246,6 +246,24 @@ public class UserPartyRepositoryCustomImpl implements UserPartyRepositoryCustom{
     }
 
     @Override
+    @Transactional
+    public boolean updateIsDeletePartyFromUserID(long userID) {
+        try {
+
+            jpaQueryFactory
+                    .update(userParty)
+                    .set(userParty.isDelete, true)
+                    .where(
+                            userParty.user.id.eq(userID)
+                    ).execute();
+
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
+    }
+
+    @Override
     public Optional<UserParty> existEntryUser(Party party, User user) {
         return Optional.ofNullable(jpaQueryFactory
                 .selectFrom(userParty)

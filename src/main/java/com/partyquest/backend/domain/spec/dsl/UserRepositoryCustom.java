@@ -10,5 +10,6 @@ public interface UserRepositoryCustom {
     Optional<User> findByEmailAndPassword(String email, String password);
 
     boolean isUser(List<Long> userID);
+    boolean updateIsDeleteFromUserID(Long userID);
 
 }

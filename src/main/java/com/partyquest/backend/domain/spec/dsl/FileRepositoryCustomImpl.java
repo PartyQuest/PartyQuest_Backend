@@ -68,4 +68,20 @@ public class FileRepositoryCustomImpl implements FileRepositoryCustom{
             throw new RuntimeException();
         }
     }
+
+    @Override
+    @Transactional
+    public boolean updateIsDeletedFromUserID(long id) {
+        try {
+            jpaQueryFactory
+                    .update(file)
+                    .set(file.isDelete, true)
+                    .where(
+                            file.user.id.eq(id)
+                    ).execute();
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
+    }
 }

@@ -37,4 +37,7 @@ public class User extends DataCheck {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<File> files = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Quest> quests = new ArrayList<>();
+
 }

@@ -12,4 +12,5 @@ public interface FileRepositoryCustom {
     File getUserThumbnailPath(User user);
     Map<Long,String> getUserImagePath(List<Long> ids);
     boolean updateIsDeletedFromPartyID(Long id);
+    boolean updateIsDeletedFromUserID(long id);
 }

@@ -29,4 +29,18 @@ public class QuestRepositoryCustomImpl implements QuestRepositoryCustom{
             throw new RuntimeException();
         }
     }
+
+    @Override
+    @Transactional
+    public boolean updateIsDeleteQuestFromUserID(long userID) {
+        try {
+            jpaQueryFactory.update(quest1)
+                    .set(quest1.isDelete, true)
+                    .where(quest1.user.id.eq(userID))
+                    .execute();
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
+    }
 }

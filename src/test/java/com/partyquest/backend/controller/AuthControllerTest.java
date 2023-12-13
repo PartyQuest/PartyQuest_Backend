@@ -20,6 +20,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -148,6 +149,19 @@ class AuthControllerTest {
                     .content(objectMapper.writeValueAsString(request))
                     .accept("application/json")
             ).andDo(print());
+        }
+    }
+
+
+    @Nested
+    @DisplayName("회원_탈퇴")
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+    class DeleteAccountTest {
+        @Test
+        @DisplayName("메인테스트01=회원_탈퇴")
+        @WithAccount("Delete_account_tester01")
+        void main01() throws Exception{
+            mockMvc.perform(delete("/auth/member")).andExpect(status().isNoContent());
         }
     }
 }
