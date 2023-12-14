@@ -42,6 +42,7 @@ public class AuthDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class SignupDto {
+        private String fileName;
         private String email;
         private String password;
         private String nickname;

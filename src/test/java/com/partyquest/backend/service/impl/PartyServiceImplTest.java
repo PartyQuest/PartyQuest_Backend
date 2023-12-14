@@ -66,7 +66,7 @@ class PartyServiceImplTest {
         System.out.println("PARTY 검색 관련 시작");
         List<Party> parties = partyRepository.getParties(null, null, null);
         for(Party p: parties) {
-            System.out.println(p.getFiles().get(0).getFilePath());
+            System.out.println(p.getFiles().get(0).getFileName());
         }
         System.out.println("PARTY 검색 관련 종료");
         
@@ -169,11 +169,8 @@ class PartyServiceImplTest {
             partyRepository.save(party);
             for (int j = 0; j < 1; j++) {
                 File file = File.builder()
-                        .errMsg("errMsg")
+                        .fileName("test")
                         .party(party)
-                        .filePath("path"+j)
-                        .fileOriginalName("origin")
-                        .fileAttachChngName("name")
                         .type(FileType.PARTY_THUMBNAIL)
                         .build();
                 fileRepository.save(file);
@@ -286,11 +283,8 @@ class PartyServiceImplTest {
                         .build());
         File file = fileRepository.save(
                 File.builder()
-                        .fileSize(1234L)
                         .type(FileType.USER_THUMBNAIL)
-                        .fileOriginalName("testOriginName")
-                        .filePath("testFilePath")
-                        .fileAttachChngName("testAttachChngName")
+                        .fileName("test")
                         .user(user)
                         .build());
         user.getFiles().add(file);
@@ -305,11 +299,8 @@ class PartyServiceImplTest {
 
             File file2 = fileRepository.save(
                     File.builder()
-                            .fileSize(1234L)
                             .type(FileType.PARTY_THUMBNAIL)
-                            .fileOriginalName("testOriginName")
-                            .filePath("testFilePath1234")
-                            .fileAttachChngName("testAttachChngName")
+                            .fileName("test")
                             .party(party)
                             .build());
             party.getFiles().add(file2);

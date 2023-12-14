@@ -27,7 +27,6 @@ public class User extends DataCheck {
     @Column
     private String sns;
 
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserParty> userParties = new ArrayList<>();
 

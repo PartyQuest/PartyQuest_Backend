@@ -40,7 +40,7 @@ public class FileRepositoryCustomImpl implements FileRepositoryCustom{
     @Override
     public Map<Long, String> getUserImagePath(List<Long> ids) {
         List<Tuple> where = jpaQueryFactory
-                .select(file.user.id, file.filePath)
+                .select(file.user.id, file.fileName)
                 .from(file).innerJoin(file.user)
                 .where(
                         file.type.eq(FileType.USER_THUMBNAIL),
@@ -49,7 +49,7 @@ public class FileRepositoryCustomImpl implements FileRepositoryCustom{
 
         Map<Long,String> map = new HashMap<>();
         for(Tuple tuple : where) {
-            map.put(tuple.get(file.user.id),tuple.get(file.filePath));
+            map.put(tuple.get(file.user.id),tuple.get(file.fileName));
         }
         return map;
     }

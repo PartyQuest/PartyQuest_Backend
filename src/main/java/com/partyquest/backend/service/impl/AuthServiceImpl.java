@@ -12,10 +12,12 @@ import com.partyquest.backend.domain.entity.User;
 import com.partyquest.backend.domain.repository.*;
 import com.partyquest.backend.domain.spec.dsl.BoardRepositoryCustomImpl;
 import com.partyquest.backend.domain.type.FileType;
+import com.partyquest.backend.domain.type.FileUploadType;
 import com.partyquest.backend.service.impl.oauth2.AccessToken;
 import com.partyquest.backend.service.impl.oauth2.ProviderService;
 import com.partyquest.backend.service.impl.oauth2.profile.ProfileDto;
 import com.partyquest.backend.service.logic.AuthService;
+import com.partyquest.backend.service.logic.FileService;
 import com.partyquest.backend.service.logic.PartyService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -44,6 +46,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final QuestRepository questRepository;
     private final BoardRepository boardRepository;
+    private final FileService fileService;
 
     @Value("${spring.social.bcrypt.key}")
     private String bcryptKey;
@@ -59,7 +62,8 @@ public class AuthServiceImpl implements AuthService {
             PartyRepository partyRepository,
             PartyService partyService,
             QuestRepository questRepository,
-            BoardRepository boardRepository
+            BoardRepository boardRepository,
+            FileService fileService
     )
     {
         this.userRepository = userRepository;
@@ -72,6 +76,7 @@ public class AuthServiceImpl implements AuthService {
         this.partyService = partyService;
         this.questRepository = questRepository;
         this.boardRepository = boardRepository;
+        this.fileService = fileService;
     }
 
     @Override
@@ -90,16 +95,14 @@ public class AuthServiceImpl implements AuthService {
         newUser = userRepository.save(newUser);
 
         //TODO: 임시로 넣은 파일 메타데이터, 실제 파일서비스 구현할 때 수정해야함!!!!!!!!!
-        File file = File.builder()
-                .fileSize(1234L)
-                .type(FileType.USER_THUMBNAIL)
-                .fileOriginalName("testOriginName")
-                .filePath("testFilePath")
-                .fileAttachChngName("testAttachChngName")
-                .user(newUser)
-                .build();
-        file = fileRepository.save(file);
-        newUser.getFiles().add(file);
+//        File file = File.builder()
+//                .fileName(dto.getFilename())
+//                .user(newUser)
+//                .type(FileType.USER_THUMBNAIL)
+//                .build();
+//        file = fileRepository.save(file);
+//        newUser.getFiles().add(file);
+        fileService.fileMetaDataUpload(FileUploadType.USER,newUser,dto.getFileName());
         return AuthDto.SignupResponseDto.entityToDto(newUser);
     }
 

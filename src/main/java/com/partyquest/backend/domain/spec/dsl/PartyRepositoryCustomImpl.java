@@ -73,7 +73,7 @@ public class PartyRepositoryCustomImpl implements PartyRepositoryCustom {
                 .select(
                         Projections.constructor(
                                 RepositoryDto.ReadPartyVO.class,
-                                file.filePath,
+                                file.fileName,
                                 party.description,party.title,party.id,
                                 user.nickname,
                                 Expressions.as(
@@ -99,7 +99,7 @@ public class PartyRepositoryCustomImpl implements PartyRepositoryCustom {
         return jpaQueryFactory
                 .selectDistinct(
                         Projections.constructor(RepositoryDto.ReadPartiesVO.class,
-                                file.filePath,party.title,party.id,user.nickname,
+                                file.fileName,party.title,party.id,user.nickname,
                                 JPAExpressions.select(userParty.count()).from(userParty).where(userParty.party.eq(party))
                                 )
                 )

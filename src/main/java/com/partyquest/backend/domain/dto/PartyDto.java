@@ -25,6 +25,7 @@ public class PartyDto {
         @NoArgsConstructor
         @AllArgsConstructor
         public static class Request {
+            private String fileName;
             private String title;
             private String description;
             private Boolean isPublic;

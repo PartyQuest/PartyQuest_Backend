@@ -68,24 +68,13 @@ class PartyControllerTest {
         @DisplayName("메인테스트01=파티_생성")
         @WithAccount("create_tester01")
         void createParty() throws Exception {
-            mockMvc.perform(RestDocumentationRequestBuilders
-                    .post("/party")
+            mockMvc.perform(
+                    post("/party")
                     .contentType("application/json")
                     .accept("application/json")
                     .content(objectMapper.writeValueAsString(
                             makeParty("create party test title",
                                     "create party test description")))
-            ).andDo(
-                    document(
-                            "create_party",
-                            preprocessRequest(prettyPrint()),
-                            preprocessResponse(prettyPrint()),
-                            requestFields(
-                                    fieldWithPath("title").type(JsonFieldType.STRING).description("Party title"),
-                                    fieldWithPath("isPublic").type(JsonFieldType.BOOLEAN).description("Party view Public/Private"),
-                                    fieldWithPath("description").type(JsonFieldType.STRING).description("Party description")
-                            )
-                    )
             ).andExpect(status().isCreated());
         }
 

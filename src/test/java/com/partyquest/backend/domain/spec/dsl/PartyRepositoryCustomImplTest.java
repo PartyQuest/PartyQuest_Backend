@@ -65,11 +65,7 @@ class PartyRepositoryCustomImplTest {
             for (int j = 0; j <2; j++) {
                 File file = File.builder()
                         .type(FileType.PARTY_THUMBNAIL)
-                        .errMsg("errMsg")
-                        .party(save)
-                        .filePath("path")
-                        .fileOriginalName("origin")
-                        .fileAttachChngName("name")
+                        .fileName("fileName")
                         .build();
                 fileRepository.save(file);
                 save.getFiles().add(file);

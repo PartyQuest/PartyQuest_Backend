@@ -23,17 +23,12 @@ public class UserParty extends DataCheck {
 
     @Column
     private boolean partyAdmin;
-
     @Column
     private boolean registered;
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-
     @ManyToOne
     @JoinColumn(name = "party_id")
     private Party party;
-
-
 }

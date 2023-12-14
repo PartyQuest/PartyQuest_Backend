@@ -32,9 +32,6 @@ public class Board extends DataCheck{
     @OneToMany(mappedBy = "board", orphanRemoval = true)
     private List<Board> boards = new LinkedList<>();
 
-    @OneToMany(mappedBy = "board", orphanRemoval = true)
-    private List<File> files = new LinkedList<>();
-
     @OneToOne(orphanRemoval = true)
     @JoinColumn(name = "writer_id")
     private User writer;

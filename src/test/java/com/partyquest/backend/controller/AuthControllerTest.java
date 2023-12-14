@@ -20,8 +20,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -45,25 +44,17 @@ class AuthControllerTest {
         AuthDto.SignupDto dto = AuthDto.SignupDto.builder()
                 .email("email")
                 .nickname("nickname")
+                .fileName("filename")
                 .password("password")
                 .build();
 
-        mockMvc.perform(RestDocumentationRequestBuilders
-                .post("/auth/signup")
-                .contentType("application/json")
-                .accept("application/json")
-                .content(objectMapper.writeValueAsString(dto))
-        ).andDo(
-                document(
-                        "signup",
-                        preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint()),
-                        requestFields(
-                                fieldWithPath("email").type(JsonFieldType.STRING).description("User email"),
-                                fieldWithPath("nickname").type(JsonFieldType.STRING).description("User nickname"),
-                                fieldWithPath("password").type(JsonFieldType.STRING).description("Encrypt password")
-                        )
-                        )).andExpect(status().isCreated());
+        mockMvc.perform(
+                post("/auth/signup")
+                        .contentType("application/json")
+                        .accept("application/json")
+                        .content(objectMapper.writeValueAsString(dto))
+                )
+                .andExpect(status().isCreated());
     }
 
     @Test

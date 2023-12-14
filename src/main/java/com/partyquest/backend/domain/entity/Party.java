@@ -17,7 +17,6 @@ public class Party extends DataCheck {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
     private Long id;
-
     @Column
     private String accessCode;
     @Column

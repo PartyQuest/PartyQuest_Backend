@@ -53,7 +53,7 @@ public class UserPartyRepositoryCustomImpl implements UserPartyRepositoryCustom{
                         Projections.constructor(
                             RepositoryDto.PartyMemberVO.class,
                                 user.id,
-                                file.filePath,
+                                file.fileName,
                                 userParty.registered,
                                 user.nickname,
                                 userParty.memberGrade
@@ -84,7 +84,7 @@ public class UserPartyRepositoryCustomImpl implements UserPartyRepositoryCustom{
                         Projections.constructor(
                                 RepositoryDto.MembershipDto.class,
                                 party.id,
-                                file.filePath,
+                                file.fileName,
                                 party.title,
                                 user.nickname,
                                 userParty.memberGrade,

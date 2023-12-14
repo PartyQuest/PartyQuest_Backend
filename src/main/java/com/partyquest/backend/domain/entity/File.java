@@ -19,20 +19,9 @@ public class File extends DataCheck {
     @Column
     @Enumerated(EnumType.STRING)
     private FileType type;
-    @Column
-    private String fileAttachChngName;
-    @Column
-    private String filePath;
-    @Column
-    private String fileOriginalName;
-    @Column
-    private long fileSize;
-    @Column
-    private String errMsg;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id")
-    private Board board;
+    @Column
+    private String fileName;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "party_id")

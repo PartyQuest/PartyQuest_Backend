@@ -72,13 +72,9 @@ public class UserPartyRepositoryCustomImplTest {
 
         File file = fileRepository.save(
                 File.builder()
-                .fileSize(1234L)
-                .type(FileType.USER_THUMBNAIL)
-                .fileOriginalName("testOriginName")
-                .filePath("testFilePath")
-                .fileAttachChngName("testAttachChngName")
-                .user(user)
-                .build());
+                        .fileName("test")
+                        .type(FileType.USER_THUMBNAIL)
+                        .build());
         user.getFiles().add(file);
 
         System.out.println(user.getId());
@@ -105,12 +101,8 @@ public class UserPartyRepositoryCustomImplTest {
                         .build());
         File file = fileRepository.save(
                 File.builder()
-                        .fileSize(1234L)
+                        .fileName("test")
                         .type(FileType.USER_THUMBNAIL)
-                        .fileOriginalName("testOriginName")
-                        .filePath("testFilePath")
-                        .fileAttachChngName("testAttachChngName")
-                        .user(user)
                         .build());
         user.getFiles().add(file);
         for(int i = 0; i < 10; i++) {
@@ -124,12 +116,8 @@ public class UserPartyRepositoryCustomImplTest {
 
             File file2 = fileRepository.save(
                     File.builder()
-                            .fileSize(1234L)
-                            .type(FileType.PARTY_THUMBNAIL)
-                            .fileOriginalName("testOriginName")
-                            .filePath("testFilePath1234")
-                            .fileAttachChngName("testAttachChngName")
-                            .party(party)
+                            .fileName("test")
+                            .type(FileType.USER_THUMBNAIL)
                             .build());
             party.getFiles().add(file2);
 
@@ -142,8 +130,6 @@ public class UserPartyRepositoryCustomImplTest {
                             .party(party)
                             .build());
         }
-
-
 
         List<RepositoryDto.MembershipDto> membershipUser = userPartyRepository.findMembershipUser(user);
         System.out.println(objectMapper.writeValueAsString(membershipUser));

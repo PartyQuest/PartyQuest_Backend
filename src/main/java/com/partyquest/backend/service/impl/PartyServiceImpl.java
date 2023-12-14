@@ -9,7 +9,9 @@ import com.partyquest.backend.domain.entity.User;
 import com.partyquest.backend.domain.entity.UserParty;
 import com.partyquest.backend.domain.repository.*;
 import com.partyquest.backend.domain.type.FileType;
+import com.partyquest.backend.domain.type.FileUploadType;
 import com.partyquest.backend.domain.type.PartyMemberType;
+import com.partyquest.backend.service.logic.FileService;
 import com.partyquest.backend.service.logic.PartyService;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -30,18 +32,23 @@ public class PartyServiceImpl implements PartyService {
     private final UserPartyRepository userPartyRepository;
     private final FileRepository fileRepository;
     private final QuestRepository questRepository;
+    private final FileService fileService;
 
     @Autowired
     public PartyServiceImpl(PartyRepository partyRepository,
                             UserRepository userRepository,
                             UserPartyRepository userPartyRepository,
                             FileRepository fileRepository,
-                            QuestRepository questRepository) {
+                            QuestRepository questRepository,
+                            FileService fileService
+    )
+    {
         this.partyRepository = partyRepository;
         this.userRepository = userRepository;
         this.userPartyRepository = userPartyRepository;
         this.fileRepository = fileRepository;
         this.questRepository = questRepository;
+        this.fileService = fileService;
     }
 
     private User getUserData(long makerId) {
@@ -69,18 +76,15 @@ public class PartyServiceImpl implements PartyService {
         party.getUserParties().add(userParty);
         user.getUserParties().add(userParty);
 
-        File file = File.builder()
-                .party(party)
-                .fileAttachChngName("test code")
-                .filePath("test path")
-                .fileOriginalName("test origin")
-                .type(FileType.PARTY_THUMBNAIL)
-                .fileSize(1234)
-                .build();
-
-        fileRepository.save(file);
-        party.getFiles().add(file);
-
+//        File file = File.builder()
+//                .party(party)
+//                .fileName(request.getFileName())
+//                .type(FileType.PARTY_THUMBNAIL)
+//                .build();
+//
+//        fileRepository.save(file);
+//        party.getFiles().add(file);
+        fileService.fileMetaDataUpload(FileUploadType.PARTY,party,request.getFileName());
         return PartyDto.CreatePartyDto.Response.entityToDto(party);
     }
 
