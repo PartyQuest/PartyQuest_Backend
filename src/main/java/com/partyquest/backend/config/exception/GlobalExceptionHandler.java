@@ -85,4 +85,11 @@ public class GlobalExceptionHandler {
         ErrorResponse response = new ErrorResponse(ex.getErrorCode());
         return new ResponseEntity<>(response,HttpStatus.valueOf(ex.getErrorCode().getStatus()));
     }
+
+    @ExceptionHandler(QuestInputErrorException.class)
+    public ResponseEntity<ErrorResponse> handleQuestInputError(QuestInputErrorException ex) {
+        log.error("handleQuestInputError",ex);
+        ErrorResponse response = new ErrorResponse(ex.getErrorCode());
+        return new ResponseEntity<>(response,HttpStatus.valueOf(ex.getErrorCode().getStatus()));
+    }
 }

@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 @Builder
@@ -42,7 +43,7 @@ public class Quest extends DataCheck {
     private Quest quest;
 
     @OneToMany(mappedBy = "quest", orphanRemoval = true)
-    private Set<Quest> quests = new LinkedHashSet<>();
+    private List<Quest> quests;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "party")
