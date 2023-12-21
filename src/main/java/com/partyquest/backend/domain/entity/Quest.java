@@ -40,9 +40,9 @@ public class Quest extends DataCheck {
 
     @ManyToOne
     @JoinColumn(name = "quest_id")
-    private Quest quest;
+    private Quest rootQuest;
 
-    @OneToMany(mappedBy = "quest", orphanRemoval = true)
+    @OneToMany(mappedBy = "rootQuest", orphanRemoval = true)
     private List<Quest> quests;
 
     @ManyToOne(cascade = CascadeType.ALL)

@@ -44,17 +44,48 @@ public class QuestDto {
     @Builder
     public static class ReadQuestDto {
 
+        @Data
+        @Builder
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class Response {
+            private Long questID;
+            private String title;
+            private String description;
+            private String startTime;
+            private String endTime;
+            private boolean complete;
+            private String writer;
+        }
     }
 
     @Data
     @Builder
     public static class ModifyQuestDto {
-
+        @Data
+        @Builder
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class Request {
+            private Long partyID;
+            private Long questID;
+            private String title;
+            private String description;
+            private String startTime;
+            private String endTime;
+        }
     }
 
     @Data
     @Builder
     public static class DeleteQuestDto {
-
+        @Data
+        @Builder
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class Request {
+            private Long partyID;
+            private Long questID;
+        }
     }
 }

@@ -14,6 +14,20 @@ public class RepositoryDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class QuestSummaryVO {
+        private Long questID;
+        private String title;
+        private String description;
+        private String startTime;
+        private String endTime;
+        private Boolean complete;
+        private String userName;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class PartyMemberVO {
         private long userID;
         private String filePath;
